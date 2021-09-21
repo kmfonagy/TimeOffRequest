@@ -1,4 +1,5 @@
 ﻿import React, { Component } from 'react';
+import { Table } from 'reactstrap'
 
 export class FetchData extends Component {
   static displayName = FetchData.name;
@@ -14,7 +15,7 @@ export class FetchData extends Component {
 
   static renderForecastsTable(forecasts) {
     return (
-      <table className='table table-striped' aria-labelledby="tabelLabel">
+      <Table className='table table-striped' aria-labelledby="tabelLabel" dark>
         <thead>
           <tr>
             <th>Date</th>
@@ -33,7 +34,7 @@ export class FetchData extends Component {
             </tr>
           )}
         </tbody>
-      </table>
+      </Table>
     );
   }
 
