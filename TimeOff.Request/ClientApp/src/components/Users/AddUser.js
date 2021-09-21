@@ -1,98 +1,79 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Col, Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
 
 const AddUser = (props) => {
+  const [user, setUser] = useState({
+    name: '',
+    email: '',
+    supervisorId: null,
+    role: '',
+    password: '',
+    disabled: false
+  })
+
+  const handleChange = (e) => {
+    setUser({ user: {[e.target.name]: e.target.value }})
+  }
+
+  const handleSubmit = () => {
+    console.log(this.state.user)
+  }
+
   return (
     <Form>
       <FormGroup row>
-        <Label for="exampleEmail" sm={2}>Email</Label>
+        <Label for="email" sm={2}>Email</Label>
         <Col sm={10}>
-          <Input type="email" name="email" id="exampleEmail" placeholder="with a placeholder" />
+          <Input 
+            type="email"
+            name="email"
+            id="email"
+            onChange={ handleChange }
+            placeholder="Email address" />
         </Col>
       </FormGroup>
       <FormGroup row>
-        <Label for="examplePassword" sm={2}>Password</Label>
+        <Label for="password" sm={2}>Password</Label>
         <Col sm={10}>
-          <Input type="password" name="password" id="examplePassword" placeholder="password placeholder" />
+          <Input 
+            type="password"
+            name="password"
+            id="password"
+            onChange={ handleChange }
+            placeholder="Password" />
         </Col>
       </FormGroup>
       <FormGroup row>
-        <Label for="exampleSelect" sm={2}>Select</Label>
+        <Label for="role" sm={2}>Select Role</Label>
         <Col sm={10}>
-          <Input type="select" name="select" id="exampleSelect">
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-            <option>4</option>
-            <option>5</option>
+          <Input 
+            type="select"
+            name="role"
+            id="role" 
+            onChange={ handleChange }
+            single>
+            <option>User</option>
+            <option>Administrator</option>
           </Input>
         </Col>
       </FormGroup>
       <FormGroup row>
-        <Label for="exampleSelectMulti" sm={2}>Select Multiple</Label>
-        <Col sm={10}>
-          <Input type="select" name="selectMulti" id="exampleSelectMulti" multiple>
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-            <option>4</option>
-            <option>5</option>
-          </Input>
-        </Col>
-      </FormGroup>
-      <FormGroup row>
-        <Label for="exampleText" sm={2}>Text Area</Label>
-        <Col sm={10}>
-          <Input type="textarea" name="text" id="exampleText" />
-        </Col>
-      </FormGroup>
-      <FormGroup row>
-        <Label for="exampleFile" sm={2}>File</Label>
-        <Col sm={10}>
-          <Input type="file" name="file" id="exampleFile" />
-          <FormText color="muted">
-            This is some placeholder block-level help text for the above input.
-            It's a bit lighter and easily wraps to a new line.
-          </FormText>
-        </Col>
-      </FormGroup>
-      <FormGroup tag="fieldset" row>
-        <legend className="col-form-label col-sm-2">Radio Buttons</legend>
-        <Col sm={10}>
-          <FormGroup check>
-            <Label check>
-              <Input type="radio" name="radio2" />{' '}
-              Option one is this and that—be sure to include why it's great
-            </Label>
-          </FormGroup>
-          <FormGroup check>
-            <Label check>
-              <Input type="radio" name="radio2" />{' '}
-              Option two can be something else and selecting it will deselect option one
-            </Label>
-          </FormGroup>
-          <FormGroup check disabled>
-            <Label check>
-              <Input type="radio" name="radio2" disabled />{' '}
-              Option three is disabled
-            </Label>
-          </FormGroup>
-        </Col>
-      </FormGroup>
-      <FormGroup row>
-        <Label for="checkbox2" sm={2}>Checkbox</Label>
         <Col sm={{ size: 10 }}>
           <FormGroup check>
             <Label check>
-              <Input type="checkbox" id="checkbox2" />{' '}
-              Check me out
+              <Input 
+                type="checkbox" 
+                id="disabled" 
+                onChange={ handleChange }
+                name= "disabled"/>{' '}
+              Disabled
             </Label>
           </FormGroup>
         </Col>
       </FormGroup>
       <FormGroup check row>
         <Col sm={{ size: 10, offset: 2 }}>
-          <Button>Submit</Button>
+          <Button onClick={ handleSubmit }>Submit</Button>
         </Col>
       </FormGroup>
     </Form>

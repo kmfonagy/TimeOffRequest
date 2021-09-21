@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
-import { Table } from 'reactstrap'
+import { Table, Button, Row } from 'reactstrap';
+import Moment from 'moment';
+import AddUser from './AddUser';
+import Col from 'reactstrap/lib/Col';
 
 export class Users extends Component {
   static displayName = Users.name;
@@ -15,7 +18,7 @@ export class Users extends Component {
 
   static renderUsersTable(users) {
     return (
-      <Table className='table table-striped' aria-labelledby="tabelLabel" dark>
+      <Table dark hover>
         <thead>
           <tr>
             <th>Name</th>
@@ -26,11 +29,13 @@ export class Users extends Component {
         </thead>
         <tbody>
           {users.map(user =>
-            <tr key={user.id}>
-              <td>{user.name}</td>
-              <td>{user.userCreated}</td>
-              <td>{user.supervisor ? user.supervisor.name : 'none'}</td>
-              <td>{user.disabled}</td>
+            <tr key={ user.id }>
+              <td>{ user.name }</td>
+              <td>{ Moment(user.userCreated).format('LL') }</td>
+              <td>{ user.supervisor ? user.supervisor.name : 'none' }</td>
+              <td>
+                <Button type="checkbox" value={ user.disabled }></Button>
+              </td>
             </tr>
           )}
         </tbody>
@@ -45,7 +50,14 @@ export class Users extends Component {
 
     return (
       <div>
-        <h1 id="tabelLabel" >Users</h1>
+        <Row>
+          <Col>
+            <h1 id="tabelLabel" >Users</h1>
+          </Col>
+          <Col>
+            <h1 id="tabelLabel" >Add User</h1>
+          </Col>
+        </Row>
         <p>All users</p>
         {contents}
       </div>
@@ -55,9 +67,9 @@ export class Users extends Component {
   async populateUserData() {
     const response = await fetch('user');
     const data = await response.json();
+    console.log(data)
     if (data.length > 0) {
         this.setState({ users: data, loading: false });
-        console.log(this.users)
     }
   }
 }
