@@ -39,6 +39,7 @@ namespace TimeOff.Request
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IRequestRepository, RequestRepository>();
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration => {
