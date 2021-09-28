@@ -154,7 +154,7 @@ namespace TimeOff.Request.Controllers
 
             try
             {
-                UserEntity r = _reqRepo.Update(id, updatedReq.Map<RequestEntity>());
+                RequestEntity r = _reqRepo.Update(id, updatedReq.Map<RequestEntity>());
 
                 _unitOfWork.SaveChanges();
 
