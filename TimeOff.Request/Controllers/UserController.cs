@@ -97,7 +97,7 @@ namespace TimeOff.Request.Controllers
 		public ActionResult<User> Post([FromBody] User user) {
 
 			try {
-				user.DateCreated = DateTimeOffset.Now;
+				user.UserCreated = DateTimeOffset.Now;
 
 				var u = _userRepo.Create(user.Map<UserEntity>());
 
