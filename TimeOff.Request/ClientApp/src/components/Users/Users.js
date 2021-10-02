@@ -65,7 +65,7 @@ export class Users extends Component {
   }
 
   async populateUserData() {
-    const response = await fetch('user');
+    const response = await fetch('api/user');
     const data = await response.json();
     console.log(data)
     if (data.length > 0) {

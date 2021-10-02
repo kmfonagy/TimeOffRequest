@@ -13,7 +13,7 @@ using TimeOff.Request.Helpers;
 namespace TimeOff.Request.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class UserController : Controller
     {
         private readonly IUserRepository _userRepo;
