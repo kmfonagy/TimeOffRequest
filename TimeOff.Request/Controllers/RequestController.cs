@@ -45,9 +45,9 @@ namespace TimeOff.Request.Controllers
         }
 
         /// <summary>
-        /// Gets all active users.
+        /// Gets all active requests.
         /// </summary>
-        /// <returns>A list of active users</returns>
+        /// <returns>A list of active requests</returns>
         [HttpGet("Active")]
         public ActionResult<IEnumerable<Domain.Shared.Models.Request>> GetActiveRequests()
         {
@@ -99,11 +99,11 @@ namespace TimeOff.Request.Controllers
         }
 
         /// <summary>
-		/// Gets the requests approved by a specific user
-		/// </summary>
-		/// <param name="approvedById">The user id who approved the requests</param>
-		/// <returns>A list of requests</returns>
-		[HttpGet("ApprovedBy/{approvedById}")]
+        /// Gets the requests approved by a specific user
+        /// </summary>
+        /// <param name="approvedById">The user id who approved the requests</param>
+        /// <returns>A list of requests</returns>
+        [HttpGet("ApprovedBy/{approvedById}")]
         public ActionResult<IEnumerable<Domain.Shared.Models.Request>> GetUserApprovals(int approvedByID)
         {
 
@@ -128,7 +128,7 @@ namespace TimeOff.Request.Controllers
 
             try
             {
-                req.CreateDate = DateTimeOffset.Now;
+                req.CreatedDate = DateTimeOffset.Now;
 
                 var r = _reqRepo.Create(req.Map<RequestEntity>());
 
@@ -143,12 +143,12 @@ namespace TimeOff.Request.Controllers
         }
 
         /// <summary>
-		/// Updates a request
-		/// </summary>
-		/// <param name="id">The request id that needs to be updated</param>
-		/// <param name="updatedReq">The request to be updated</param>
-		/// <returns>The request that was updated.</returns>
-		[HttpPut("{id}")]
+        /// Updates a request
+        /// </summary>
+        /// <param name="id">The request id that needs to be updated</param>
+        /// <param name="updatedReq">The request to be updated</param>
+        /// <returns>The request that was updated.</returns>
+        [HttpPut("{id}")]
         public ActionResult<Domain.Shared.Models.Request> Put(int id, [FromBody] Domain.Shared.Models.Request updatedReq)
         {
 

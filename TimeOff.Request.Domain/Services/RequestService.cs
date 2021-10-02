@@ -23,6 +23,7 @@ namespace TimeOff.Request.Domain.Services
         public IEnumerable<RequestEntity> ActiveRequests()
         {
             return _reqRepo.Get()
+                .Include(r => r.CreatedBy)
                 .Include(r => r.ApprovedBy)
                 .Where(r => !r.Disabled);
         }
@@ -37,6 +38,7 @@ namespace TimeOff.Request.Domain.Services
             }
 
             return _reqRepo.Get()
+                .Include(r => r.CreatedBy)
                 .Include(r => r.ApprovedBy)
                 .Where(r => r.ApprovedById == approvedById);
         }
@@ -52,6 +54,7 @@ namespace TimeOff.Request.Domain.Services
 
             return _reqRepo.Get()
                 .Include(r => r.CreatedBy)
+                .Include(r => r.ApprovedBy)
                 .Where(r => r.CreatedById == createdById);
         }
     }

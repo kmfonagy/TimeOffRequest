@@ -19,18 +19,20 @@ namespace TimeOff.Request.Domain.Repositories
         public IQueryable<RequestEntity> Get()
         {
             return _db.Requests
-                .Include(r => r.CreatedBy);
+                .Include(r => r.CreatedBy)
+                .Include(r => r.ApprovedBy);
         }
 
         public RequestEntity Get(int id)
         {
             var r = _db.Requests
                 .Include(r => r.CreatedBy)
+                .Include(r => r.ApprovedBy)
                 .FirstOrDefault(r => r.Id == id);
 
             if (r == null)
             {
-                throw new Exception($"Rquest with id: {id} does not exist.");
+                throw new Exception($"Request with id: {id} does not exist.");
             }
 
             return r;
@@ -38,7 +40,9 @@ namespace TimeOff.Request.Domain.Repositories
 
         public RequestEntity Create(RequestEntity entity)
         {
-            var req = _db.Requests.Where(r => r.Id == entity.Id);
+            var req = _db.Requests.Where(r => r.CreatedById == entity.CreatedById
+                && r.StartDate == entity.StartDate
+                && r.EndDate == entity.EndDate);
 
             if (req.Count() > 0)
             {
@@ -50,15 +54,20 @@ namespace TimeOff.Request.Domain.Repositories
 
         public RequestEntity Update(int id, RequestEntity entity)
         {
-            var req = _db.Requests.Include(r => r.ApprovedBy).FirstOrDefault(r => r.Id == id);
+            var req = _db.Requests
+                .Include(r => r.CreatedBy)
+                .Include(r => r.ApprovedBy)
+                .FirstOrDefault(r => r.Id == id);
 
             if (req == null)
             {
                 throw new Exception("Request does not exist.");
             }
 
-            if (_db.Requests.Where(r => r.CreatedBy == entity.CreatedBy &&
-                r.Id != entity.Id).Count() > 0)
+            if (_db.Requests.Where(r => r.CreatedById == entity.CreatedById
+                && r.StartDate == entity.StartDate
+                && r.EndDate == entity.EndDate
+                && r.Id != entity.Id).Count() > 0)
             {
                 throw new Exception("Request already exists.");
             }

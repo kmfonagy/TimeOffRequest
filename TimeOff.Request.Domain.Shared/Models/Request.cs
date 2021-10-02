@@ -17,7 +17,7 @@ namespace TimeOff.Request.Domain.Shared.Models
 
         public string Description { get; set; }
 
-        public DateTimeOffset CreateDate { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
 
         public DateTimeOffset ApprovedDate { get; set; }
 

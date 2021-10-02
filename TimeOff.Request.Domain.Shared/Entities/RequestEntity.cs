@@ -12,14 +12,14 @@ namespace TimeOff.Request.Domain.Shared.Entities
         [ForeignKey("CreatedById")]
         public virtual UserEntity CreatedBy { get; set; }
 
-        public int ApprovedById { get; set; }
+        public int? ApprovedById { get; set; }
 
         [ForeignKey("ApprovedById")]
         public virtual UserEntity ApprovedBy { get; set; }
 
         public string Description { get; set; }
 
-        public DateTimeOffset CreateDate { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
 
         public DateTimeOffset ApprovedDate { get; set; }
 
