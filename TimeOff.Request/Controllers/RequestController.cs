@@ -64,7 +64,7 @@ namespace TimeOff.Request.Controllers
         /// <summary>
         /// Gets a specific request
         /// </summary>
-        /// <param name="=id">The request id to retreive</param>
+        /// <param name="id">The request id to retreive</param>
         /// <returns>A specific request</returns>
         [HttpGet("{id}")]
         public ActionResult<Domain.Shared.Models.Request> Get(int id)
@@ -104,16 +104,16 @@ namespace TimeOff.Request.Controllers
         /// <param name="approvedById">The user id who approved the requests</param>
         /// <returns>A list of requests</returns>
         [HttpGet("ApprovedBy/{approvedById}")]
-        public ActionResult<IEnumerable<Domain.Shared.Models.Request>> GetUserApprovals(int approvedByID)
+        public ActionResult<IEnumerable<Domain.Shared.Models.Request>> GetUserApprovals(int approvedById)
         {
 
             try
             {
-                return _reqService.ApprovedBy(approvedByID).Select(r => r.Map<Domain.Shared.Models.Request>()).ToList();
+                return _reqService.ApprovedBy(approvedById).Select(r => r.Map<Domain.Shared.Models.Request>()).ToList();
             }
             catch (Exception ex)
             {
-                return NotFound($"User with id={approvedByID} was not found.\n {ex.Message}");
+                return NotFound($"User with id={approvedById} was not found.\n {ex.Message}");
             }
         }
 
