@@ -13,7 +13,7 @@ using TimeOff.Request.Helpers;
 namespace TimeOff.Request.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class UserController : Controller
     {
         private readonly IUserRepository _userRepo;
@@ -97,7 +97,7 @@ namespace TimeOff.Request.Controllers
 		public ActionResult<User> Post([FromBody] User user) {
 
 			try {
-				user.UserCreated = DateTimeOffset.Now;
+				user.DateCreated = DateTimeOffset.Now;
 
 				var u = _userRepo.Create(user.Map<UserEntity>());
 

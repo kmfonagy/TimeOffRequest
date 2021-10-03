@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TimeOff.Request.DataAccess;
 
 namespace TimeOff.Request.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211002170315_CreatedRequestEntity")]
+    partial class CreatedRequestEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -70,41 +72,20 @@ namespace TimeOff.Request.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTimeOffset>("DateCreated")
-                        .HasColumnType("TEXT");
-
                     b.Property<bool>("Disabled")
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Hash")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTimeOffset>("LastLogin")
-                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .HasColumnType("TEXT");
 
-                    b.Property<float>("NumberOfDaysOff")
-                        .HasColumnType("REAL");
-
-                    b.Property<string>("PasswordResetToken")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("RequiresPasswordReset")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Roles")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Salt")
+                    b.Property<string>("Role")
                         .HasColumnType("TEXT");
 
                     b.Property<int?>("SupervisorId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<DateTimeOffset>("UserCreated")
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
