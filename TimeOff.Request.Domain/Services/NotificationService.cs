@@ -20,18 +20,18 @@ namespace TimeOff.Request.Domain.Services
             this._db = db;
         }
 
-        public IEnumerable<NotificationEntity> ReadNotifications()
+        public IEnumerable<NotificationEntity> ReadNotifications(int userId)
         {
             return _notificationRepo.Get()
                 .Include(n => n.NotifyUser)
-                .Where(n => n.Read);
+                .Where(n => n.Read && n.NotifyUserId == userId);
         }
 
-        public IEnumerable<NotificationEntity> UnreadNotifications()
+        public IEnumerable<NotificationEntity> UnreadNotifications(int userId)
         {
             return _notificationRepo.Get()
                 .Include(n => n.NotifyUser)
-                .Where(n => !n.Read);
+                .Where(n => !n.Read && n.NotifyUserId == userId);
         }
     }
 }

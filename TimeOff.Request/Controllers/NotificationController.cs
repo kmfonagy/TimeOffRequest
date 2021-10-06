@@ -11,7 +11,7 @@ using TimeOff.Request.Helpers;
 namespace TimeOff.Request.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class NotificationController : Controller
     {
         private readonly INotificationRepository _notificationRepo;
@@ -41,15 +41,16 @@ namespace TimeOff.Request.Controllers
         }
 
         /// <summary>
-        /// Gets all Unread notifications
+        /// Gets all Unread notifications for a specific user
         /// </summary>
+        /// <param name="userId">The id of the user trying to get their notifications</param>
         /// <returns>A list of unread notifications</returns>
-        [HttpGet]
-        public ActionResult<IEnumerable<Notification>> GetUnreadNotifications()
+        [HttpGet("Unread")]
+        public ActionResult<IEnumerable<Notification>> GetUnreadNotifications(int userId)
         {
             try
             {
-                return _notificationService.UnreadNotifications().Select(n => n.Map<Notification>()).ToList();
+                return _notificationService.UnreadNotifications(userId).Select(n => n.Map<Notification>()).ToList();
             }
             catch (Exception ex)
             {
@@ -58,15 +59,16 @@ namespace TimeOff.Request.Controllers
         }
 
         /// <summary>
-        /// Gets all read notifications
+        /// Gets all read notifications for a specific user
         /// </summary>
+        /// <param name="userId">The id of the user trying to get their notifications</param>
         /// <returns>A list of read notifications</returns>
-        [HttpGet]
-        public ActionResult<IEnumerable<Notification>> GetReadNotifications()
+        [HttpGet("Read")]
+        public ActionResult<IEnumerable<Notification>> GetReadNotifications(int userId)
         {
             try
             {
-                return _notificationService.ReadNotifications().Select(n => n.Map<Notification>()).ToList();
+                return _notificationService.ReadNotifications(userId).Select(n => n.Map<Notification>()).ToList();
             }
             catch (Exception ex)
             {

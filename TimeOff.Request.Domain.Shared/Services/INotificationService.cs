@@ -6,8 +6,8 @@ namespace TimeOff.Request.Domain.Shared.Services
 {
     public interface INotificationService
     {
-        public IEnumerable<NotificationEntity> ReadNotifications();
+        public IEnumerable<NotificationEntity> ReadNotifications(int userId);
 
-        public IEnumerable<NotificationEntity> UnreadNotifications();
+        public IEnumerable<NotificationEntity> UnreadNotifications(int userId);
     }
 }
