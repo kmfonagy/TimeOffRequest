@@ -5,7 +5,7 @@ import { Home } from './components/Home';
 import { FetchData } from './components/FetchData';
 import { Counter } from './components/Counter';
 import { Users } from './components/Users/Users';
-import { History } from './components/Requests/History';
+import { Requests } from './components/Requests/Requests';
 
 import './custom.css'
 
@@ -19,7 +19,7 @@ export default class App extends Component {
         <Route path='/counter' component={Counter} />
         <Route path='/fetch-data' component={FetchData} />
         <Route path='/users' component={Users} />
-        <Route path='/history' component={History} />
+        <Route path='/history' component={Requests} />
       </Layout>
     );
   }

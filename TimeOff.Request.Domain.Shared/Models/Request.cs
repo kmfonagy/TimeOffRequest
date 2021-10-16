@@ -11,7 +11,7 @@ namespace TimeOff.Request.Domain.Shared.Models
 
         public virtual UserEntity CreatedBy { get; set; }
 
-        public int ApprovedById { get; set; }
+        public int? ApprovedById { get; set; }
 
         public virtual UserEntity ApprovedBy { get; set; }
 

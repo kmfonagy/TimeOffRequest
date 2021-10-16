@@ -1,106 +1,185 @@
 ﻿import React, { Component } from 'react';
-import { Table, Button, Row } from 'reactstrap';
+import {
+    Row, Col, Button, Dropdown, DropdownToggle, DropdownMenu,
+    DropdownItem, InputGroup, InputGroupText, InputGroupAddon, Input
+} from 'reactstrap';
 import Moment from 'moment';
 import RequestTable from './RequestTable';
-import { Col, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 
 export class History extends Component {
     constructor(props) {
         super(props);
         this.state = {
             requests: [],
-            allReq: [],
+            approval: null,
             loading: true,
-            lastClicked: 'All',
+            lastClicked: 'History',
             open: false,
+            afterDate: null,
+            beforeDate: null,
+            filter: false,
+            sorted: [],
             testId: 2
         };
 
         this.curDate = new Date();
+        this.filterApproved = this.filterApproved.bind(this)
+        this.afterDateChange = this.afterDateChange.bind(this)
+        this.beforeDateChange = this.beforeDateChange.bind(this)
+        this.filterByDate = this.filterByDate.bind(this)
     }
 
     componentDidMount() {
         this.populateRequestData();
+        console.log("Component did mount")
     }
 
-    toggle = () => {
+    setAll = () => {
         this.setState({
-            open: !open
+            filter: false,
+            lastClicked: "History"
         })
     }
 
-    setLastClicked = (value) => {
-        if (value === 'All') {
-            this.setState({
-                requests: this.state.allReq,
-                lastClicked: value
-            })
-        }
-        else if (value === 'Timeframe') {
-            let sorted = this.state.allReq.sort((a, b) => b.startDate > a.startDate ? 1 : -1);
-            this.setState({
-                requests: sorted,
-                lastClicked: value
-            })
-        }
-        else if (value === 'Approval') {
-            // need to identify how we want to sort this
+    toggle = () => {
+        const opening = !this.state.open;
+        this.setState({
+            open: opening
+        })
+    }
 
+    filterApproved = (value) => {
+        let sorted = []
+        if (value === "Approved") {
+            for (let i = 0; i < this.state.requests.length; i++) {
+                if (this.state.requests[i].approvedById !== null) {
+                    sorted.push(this.state.requests[i]);
+                }
+            }
         }
-        else if (value === 'Status') {
-            let sorted = this.state.allReq.filter(req => req.endDate < this.curDate);
+
+        if (value === "Unapproved") {
+            for (let i = 0; i < this.state.requests.length; i++) {
+                if (this.state.requests[i].approvedById === null) {
+                    sorted.push(this.state.requests[i]);
+                }
+            }
+        }
+
+        this.setState({
+            sorted: sorted,
+            lastClicked: value,
+            filter: true,
+        })
+
+        console.log(sorted + '\n' + this.state.sorted + "\n" + this.state.filter)
+    }
+
+    afterDateChange = (e) => {
+        console.log(e.target.value);
+        this.setState({
+            afterDate: e.target.value
+        })
+        console.log(this.state.afterDate)
+    }
+
+    beforeDateChange = (e) => {
+        this.setState({
+            beforeDate: e.target.value
+        })
+        
+    }
+
+    filterByDate = () => {
+        let sorted = []
+        if (this.state.afterDate === null) {
+            sorted = this.state.requests.filter(r => r.createdDate < this.state.beforeDate)
+
             this.setState({
-                requests: sorted,
-                lastClicked: value
+                sorted: sorted,
+                lastClicked: "By Date",
+                filter: true
+            })
+        } else if (this.state.beforeDate === null) {
+            sorted = this.state.requests.filter(r => r.createdDate > this.state.afterDate)
+
+            this.setState({
+                sorted: sorted,
+                lastClicked: "By Date",
+                filter: true
+            })
+        } else {
+            sorted = this.state.requests.filter(r => r.createdDate < this.state.beforeDate &&
+                r.createdDate > this.afterDate)
+
+            this.setState({
+                sorted: sorted,
+                lastClicked: "By Date",
+                filter: true
             })
         }
-    } 
+    }
 
-    static renderReqsTable(requests) {
+    renderReqsTable(state) {
         return (
-            <RequestTable requests={requests} />
-        );
+            <RequestTable state={state} />
+        )
     }
 
     render() {
         const dropdown = [
-            { id: 1, name: 'All Requests', value: 'All' },
-            { id: 2, name: 'By Timeframe', value: 'Timeframe' },
-            { id: 3, name: 'By Approval', value: 'Approval' },
-            { id: 4, name: 'Completion Status', value: 'Status' }
+            { id: 0, value: "Approved" },
+            { id: 0, value: "Unapproved" }
         ]
-        let contents = this.state.loading
+
+        const contents = this.state.loading
             ? <p><em>Loading...</em></p>
-            : History.renderReqsTable(this.state.requests);
+            : this.renderReqsTable(this.state);
 
         return (
             <div>
-                <Row>
-                    <Col>
-                        <h1 id="tabelLabel" >Request History</h1>
-                    </Col>
+                <Row key='1'>
+                    <h4>{this.state.lastClicked}</h4>
+                    <Button color="secondary" onClick={this.setAll}>All</Button>
+                    <Dropdown group isOpen={this.state.open} size="sm" toggle={this.toggle}>
+                        <DropdownToggle caret>
+                            Approval Status
+                        </DropdownToggle>
+                        <DropdownMenu container="body">
+                            {dropdown.map(d =>
+                                <DropdownItem
+                                    key={d.id}
+                                    value={d.value}
+                                    onClick={this.filterApproved.bind(this, d.value)}
+                                >{d.value}</DropdownItem>
+                            )}
+                        </DropdownMenu>
+                    </Dropdown>
+                    <InputGroup>
+                        <InputGroupAddon addonType="prepend" >After</InputGroupAddon>
+                        <Input
+                            key="after"
+                            id="afterDate"
+                            name="afterDate"
+                            value={this.state.afterDate}
+                            type="date"
+                            onChange={this.afterDateChange}
+                        />
+                        <InputGroupAddon addonType="prepend">Before</InputGroupAddon>
+                        <Input
+                            key="before"
+                            id="beforeDate"
+                            name="beforeDate"
+                            value={this.state.beforeDate}
+                            type="date"
+                            onChange={this.beforeDateChange}
+                        />
+                        <Button>Filter</Button>
+                    </InputGroup>
                 </Row>
-                <Row>
-                    <Col>
-                        <div>
-                            <Dropdown group isOpen={this.state.open} size="sm" toggle={this.toggle}>
-                                <DropdownToggle caret>
-                                    {this.state.lastClicked}
-                                </DropdownToggle>
-                                <DropdownMenu container="body">
-                                    {dropdown.map((id, name, value) =>
-                                        <DropdownItem
-                                            key={id}
-                                            value={value}
-                                            onClick={this.setLastClicked.bind(this, value)}
-                                        >{name}</DropdownItem>
-                                    )}
-                                </DropdownMenu>
-                            </Dropdown>
-                        </div>
-                    </Col>
+                <Row key="2">
+                    {contents}
                 </Row>
-                {contents}
             </div>
         );
     }
@@ -111,10 +190,11 @@ export class History extends Component {
         console.log(data)
         if (data.length > 0) {
             this.setState({
-                requests: data,
-                allReq: data,
+                requests: data.sort((a, b) => b.createdDate > a.createdDate ? 1 : -1),
                 loading: false
             });
         }
     }
 }
+
+export default History;
