@@ -12,6 +12,7 @@ namespace TimeOff.Request.DataAccess
         }
 
         public DbSet<UserEntity> Users { get; set; }
+        public DbSet<NotificationEntity> Notifications { get; set; }
 
         public DbSet<RequestEntity> Requests { get; set; }
 
@@ -21,6 +22,11 @@ namespace TimeOff.Request.DataAccess
                 .HasKey(u => u.Id);
             modelBuilder.Entity<RequestEntity>()
                 .HasKey(r => r.Id);
+
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<NotificationEntity>()
+                .HasKey(n => n.Id);
 
             base.OnModelCreating(modelBuilder);
         }
