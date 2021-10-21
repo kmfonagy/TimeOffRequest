@@ -23,8 +23,6 @@ namespace TimeOff.Request.DataAccess
             modelBuilder.Entity<RequestEntity>()
                 .HasKey(r => r.Id);
 
-            base.OnModelCreating(modelBuilder);
-
             modelBuilder.Entity<NotificationEntity>()
                 .HasKey(n => n.Id);
 

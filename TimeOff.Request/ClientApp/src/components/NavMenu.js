@@ -21,6 +21,12 @@ export class NavMenu extends Component {
     });
   }
 
+  logout = () => {
+    localStorage.removeItem('user')
+    localStorage.clear()
+    window.location.reload()
+  }
+
   render () {
     return (
       <header>
@@ -34,16 +40,13 @@ export class NavMenu extends Component {
                   <NavLink tag={Link} className="text-dark" to="/">Home</NavLink>
                 </NavItem>
                 <NavItem>
-                  <NavLink tag={Link} className="text-dark" to="/counter">Counter</NavLink>
-                </NavItem>
-                <NavItem>
-                  <NavLink tag={Link} className="text-dark" to="/fetch-data">Fetch data</NavLink>
-                </NavItem>
-                <NavItem>
                   <NavLink tag={Link} className="text-dark" to="/users">Users</NavLink>
                 </NavItem>
                 <NavItem>
                   <NavLink tag={Link} className="text-dark" to="/history">Requests</NavLink>
+                </NavItem>
+                <NavItem>
+                  <NavLink tag={Link} className="text-dark" to="/" onClick={ this.logout }>Logout</NavLink>
                 </NavItem>
               </ul>
             </Collapse>

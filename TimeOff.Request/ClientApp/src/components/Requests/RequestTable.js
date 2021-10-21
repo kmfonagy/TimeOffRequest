@@ -1,23 +1,23 @@
 ﻿import React, { Component } from 'react';
-import { Table, Input, Row } from 'reactstrap';
+import { Table, Input } from 'reactstrap';
 import Moment from 'moment';
 
 export class RequestTable extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            requests: props.state.requests
+            requests: props.state.requests,
+            sorted: props.state.sorted
         }
     }
 
 
     render() {
-        
-
         return (
             <Table dark hover>
                 <thead>
                     <tr>
+                        <th>Request Number</th>
                         <th>Created Date</th>
                         <th>Approved</th>
                         <th>Start Date</th>
@@ -28,8 +28,9 @@ export class RequestTable extends Component {
                 </thead>
 
                 <tbody>
-                    {this.state.requests.filter(r => r.archived === false).map(req =>
+                    {this.state.sorted.filter(r => r.archived === false).map(req =>
                         <tr key={req.id}>
+                            <td>{ req.id }</td>
                             <td>{Moment(req.createdDate).format('LL')}</td>
                             {req.approvedById !== null ? (
                                 <td>Approved</td>
@@ -40,7 +41,7 @@ export class RequestTable extends Component {
                             <td>{Moment(req.endDate).format('LL')}</td>
                             <td>{req.numberOfDays}</td>
                             <td>
-                                <Input type="checkbox" checked={req.canceled}></Input>
+                                <Input type="checkbox" checked={req.canceled} readOnly></Input>
                             </td>
                         </tr>
                     )}
