@@ -160,8 +160,10 @@ export class History extends Component {
                             )}
                         </DropdownMenu>
                     </Dropdown>
-                    <InputGroup>
-                        <InputGroupAddon addonType="prepend" >After</InputGroupAddon>
+                </Row>
+                <Row key="2">
+                    <InputGroup className="ml-3 mb-2">
+                        <InputGroupAddon addonType="prepend">After</InputGroupAddon>
                         <Input
                             key="after"
                             id="afterDate"
@@ -169,7 +171,7 @@ export class History extends Component {
                             value={this.state.afterDate === null ? '' : this.state.afterDate}
                             type="date"
                             onChange={this.afterDateChange}
-                            style={{ maxWidth: '180px' }}
+                            style={{ maxWidth: '150px' }}
                         />
                         <InputGroupAddon addonType="prepend">Before</InputGroupAddon>
                         <Input
@@ -179,12 +181,12 @@ export class History extends Component {
                             value={this.state.beforeDate === null ? '' : this.state.beforeDate}
                             type="date"
                             onChange={this.beforeDateChange}
-                            style={{ maxWidth: '180px' }}
+                            style={{ maxWidth: '150px' }}
                         />
-                        <Button onClick={this.filterByDate}>Filter</Button>
+                        <Button onClick={this.filterByDate} className="ml-2">Filter</Button>
                     </InputGroup>
                 </Row>
-                <Row key="2">
+                <Row key="3">
                     {this.state.loading
                         ? <p><em>Loading...</em></p>
                         : this.renderReqsTable(this.state)}

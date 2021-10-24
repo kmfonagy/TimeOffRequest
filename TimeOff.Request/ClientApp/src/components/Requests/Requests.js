@@ -1,5 +1,5 @@
 ﻿import React, { Component } from 'react';
-import { Button, Row, Col, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
+import { Row, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import History from './History';
 
 export class Requests extends Component {

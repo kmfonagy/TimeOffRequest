@@ -6,21 +6,23 @@ import { FetchData } from './components/FetchData';
 import { Counter } from './components/Counter';
 import { Users } from './components/Users/Users';
 import { Requests } from './components/Requests/Requests';
+import { ViewRequest } from './components/Requests/ViewRequest';
 
 import './custom.css'
 
 export default class App extends Component {
-  static displayName = App.name;
+    static displayName = App.name;
 
-  render () {
-    return (
-      <Layout>
-        <Route exact path='/' component={Home} />
-        <Route path='/counter' component={Counter} />
-        <Route path='/fetch-data' component={FetchData} />
-        <Route path='/users' component={Users} />
-        <Route path='/history' component={Requests} />
-      </Layout>
-    );
-  }
+    render() {
+        return (
+            <Layout>
+                <Route exact path='/' component={Home} />
+                <Route path='/counter' component={Counter} />
+                <Route path='/fetch-data' component={FetchData} />
+                <Route path='/users' component={Users} />
+                <Route path='/history' component={Requests} />
+                <Route path='/request/:id' component={ViewRequest} />
+            </Layout>
+        );
+    }
 }
