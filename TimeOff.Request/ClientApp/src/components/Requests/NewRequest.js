@@ -87,7 +87,8 @@ export class NewRequest extends Component {
 
     // Function to submit updated state to POST functions
     async handleSubmit(event) {
-        if (this.state.startDate !== null || this.state.endDate !== null || this.state.description !== null) {
+        if (this.state.startDate !== null || this.state.endDate !== null 
+            || this.state.description !== null) {
             console.log(this.state)
             event.preventDefault();
             await submitRequest(this.state);
@@ -160,7 +161,8 @@ export class NewRequest extends Component {
                 </FormGroup>
                 <FormGroup row>
                     <Label for='numberOfDays' sm={12}>
-                        Number of Days: {this.state.loading ? <em>Loading...</em> : this.renderAvailableDays(this.state.numberOfDays)}
+                        Number of Days: {this.state.loading ? <em>Loading...</em> 
+                        : this.renderAvailableDays(this.state.numberOfDays)}
                     </Label>
                 </FormGroup>
                 <FormGroup row>
