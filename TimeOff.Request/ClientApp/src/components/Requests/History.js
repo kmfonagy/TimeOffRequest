@@ -171,7 +171,7 @@ export class History extends Component {
                             value={this.state.afterDate === null ? '' : this.state.afterDate}
                             type="date"
                             onChange={this.afterDateChange}
-                            style={{ maxWidth: '150px' }}
+                            style={{ maxWidth: '180px' }}
                         />
                         <InputGroupAddon addonType="prepend">Before</InputGroupAddon>
                         <Input
@@ -181,7 +181,7 @@ export class History extends Component {
                             value={this.state.beforeDate === null ? '' : this.state.beforeDate}
                             type="date"
                             onChange={this.beforeDateChange}
-                            style={{ maxWidth: '150px' }}
+                            style={{ maxWidth: '180px' }}
                         />
                         <Button onClick={this.filterByDate} className="ml-2">Filter</Button>
                     </InputGroup>

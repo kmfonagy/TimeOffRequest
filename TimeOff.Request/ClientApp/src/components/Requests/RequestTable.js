@@ -10,7 +10,7 @@ export class RequestTable extends Component {
         super(props);
         this.state = {
             requests: props.state.requests,
-            sorted: props.state.sorted,
+            sorted: props.state.sorted
         }
     }
 

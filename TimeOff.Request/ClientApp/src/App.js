@@ -7,6 +7,7 @@ import { Counter } from './components/Counter';
 import { Users } from './components/Users/Users';
 import { Requests } from './components/Requests/Requests';
 import { ViewRequest } from './components/Requests/ViewRequest';
+import { Login } from './components/Login/Login'
 
 import './custom.css'
 
@@ -19,6 +20,7 @@ export default class App extends Component {
                 <Route exact path='/' component={Home} />
                 <Route path='/counter' component={Counter} />
                 <Route path='/fetch-data' component={FetchData} />
+                <Route path='/login' component={Login} />
                 <Route path='/users' component={Users} />
                 <Route path='/history' component={Requests} />
                 <Route path='/request/:id' component={ViewRequest} />
