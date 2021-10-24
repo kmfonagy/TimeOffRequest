@@ -23,7 +23,7 @@ const updateRequest = async values => {
             startDate: values.startDate,
             endDate: values.endDate,
             numberOfDays: values.numberOfDays,
-            canceled: values.canceled,
+            canceled: values.checked,
             archived: false,
             disabled: false
         })
@@ -47,10 +47,11 @@ export class ViewRequest extends Component {
             archived: false,
             disabled: false,
             loading: true,
+            checked: false
         }
 
         this.onDescriptionChange = this.onInputChange.bind(this, 'description');
-        this.onCancel = this.onInputChange.bind(this, 'canceled');
+        this.onCancel = this.onInputChange.bind(this, 'checked');
         this.onStartChange = this.onInputChange.bind(this, 'startDate');
         this.onEndChange = this.onInputChange.bind(this, 'endDate')
     }
