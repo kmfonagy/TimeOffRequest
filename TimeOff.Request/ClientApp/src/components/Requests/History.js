@@ -146,33 +146,37 @@ export class History extends Component {
             <div>
                 <Row key='1'>
                     <h4 className="m-3">{this.state.lastClicked}</h4>
-                    <Button color="secondary" onClick={this.setAll} className="m-2">All</Button>
-                    <Dropdown group isOpen={this.state.open} size="sm" toggle={this.toggle} className="m-2">
-                        <DropdownToggle caret>
-                            Approval Status
-                        </DropdownToggle>
-                        <DropdownMenu container="body">
-                            {dropdown.map(d =>
-                                <DropdownItem
-                                    key={d.id}
-                                    value={d.value}
-                                    onClick={this.filterApproved.bind(this, d.value)}
-                                >{d.value}</DropdownItem>
-                            )}
-                        </DropdownMenu>
-                    </Dropdown>
+                    
                     <InputGroup>
-                        <InputGroupAddon addonType="prepend" >After</InputGroupAddon>
+                        <Button color="secondary" onClick={this.setAll} className="m-2" style={{height: '40px'}}>All</Button>
+                        <Dropdown group isOpen={this.state.open} size="sm" toggle={this.toggle} className="m-2" style={{height: '40px'}}>
+                            <DropdownToggle caret>
+                                Approval Status
+                            </DropdownToggle>
+                            <DropdownMenu container="body">
+                                {dropdown.map(d =>
+                                    <DropdownItem
+                                        key={d.id}
+                                        value={d.value}
+                                        onClick={this.filterApproved.bind(this, d.value)}
+                                    >{d.value}</DropdownItem>
+                                )}
+                            </DropdownMenu>
+                        </Dropdown>
+                        <InputGroupAddon 
+                        size='sm' addonType="prepend" className="mb-2 mt-2 ml-2" style={{height: '40px'}}>After</InputGroupAddon>
                         <Input
                             key="after"
                             id="afterDate"
                             name="afterDate"
                             value={this.state.afterDate === null ? '' : this.state.afterDate}
                             type="date"
+                            className="mb-2 mt-2"
                             onChange={this.afterDateChange}
-                            style={{ maxWidth: '180px' }}
+                            style={{ maxWidth: '180px', textAlign: 'center', height: '40px' }}
                         />
-                        <InputGroupAddon addonType="prepend">Before</InputGroupAddon>
+                        <InputGroupAddon addonType="prepend" className="mb-2 mt-2 ml-2" 
+                        size='sm' style={{height: '40px'}}>Before</InputGroupAddon>
                         <Input
                             key="before"
                             id="beforeDate"
@@ -180,9 +184,10 @@ export class History extends Component {
                             value={this.state.beforeDate === null ? '' : this.state.beforeDate}
                             type="date"
                             onChange={this.beforeDateChange}
-                            style={{ maxWidth: '180px' }}
+                            style={{ maxWidth: '180px', textAlign: 'center', height: '40px' }}
+                            className="mb-2 mt-2"
                         />
-                        <Button onClick={this.filterByDate}>Filter</Button>
+                        <Button onClick={this.filterByDate} className="m-2" size='sm' style={{height: '40px'}}>Filter</Button>
                     </InputGroup>
                 </Row>
                 <Row key="2">

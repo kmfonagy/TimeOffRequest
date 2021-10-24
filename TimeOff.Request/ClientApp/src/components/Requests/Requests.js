@@ -1,6 +1,7 @@
 ﻿import React, { Component } from 'react';
-import { Button, Row, Col, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
+import { Row, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import History from './History';
+import NewRequest from './NewRequest';
 
 export class Requests extends Component {
     constructor(props) {
@@ -36,7 +37,7 @@ export class Requests extends Component {
         return (
             <div>
                 <Row key='1'>
-                    <Dropdown group isOpen={this.state.open} size="lg" toggle={this.toggle}>
+                    <Dropdown group isOpen={this.state.open} size="md" toggle={this.toggle}>
                         <DropdownToggle caret>
                             {this.state.title}
                         </DropdownToggle>
@@ -55,7 +56,7 @@ export class Requests extends Component {
                     {this.state.displaying === 'history' ? (
                         <History />
                     ) : (
-                        <div>&lt;New Request&gt;</div>
+                        <NewRequest />
                     )}
                 </Row>
             </div>
