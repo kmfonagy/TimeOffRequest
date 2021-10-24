@@ -44,10 +44,11 @@ const updateUser = async values => {
             email: values.user.email,
             dateCreated: values.user.dateCreated,
             supervisorId: values.user.supervisorId,
-            numberOfDaysOff: (values.user.numberOfDaysOff - values.numberOfDays),
+            numberOfDaysOff: values.available,
             roles: values.user.roles,
             passwordResetToken: values.user.passwordResetToken,
             requiresPasswordReset: values.user.requiresPasswordReset,
+            lastLogin: values.user.lastLogin,
             disabled: values.user.disabled
         })
     });
@@ -64,8 +65,11 @@ export class NewRequest extends Component {
             numberOfDays: 0,
             user: [],
             error: '',
-            loading: true
+            loading: true,
+            available: 0
         }
+
+        this.handleSubmit = this.handleSubmit.bind(this)
     }
 
     componentDidMount() {
@@ -81,11 +85,16 @@ export class NewRequest extends Component {
         })
     }
 
+    // Function to submit updated state to POST functions
     async handleSubmit(event) {
-        console.log(this.state)
-        event.preventDefault();
-        await submitRequest(this.state);
-        await updateUser(this.state);
+        if (this.state.startDate !== null || this.state.endDate !== null || this.state.description !== null) {
+            console.log(this.state)
+            event.preventDefault();
+            await submitRequest(this.state);
+            await updateUser(this.state);
+        } else {
+            return this.setState({ error: 'Not all required fields entered.' });
+        }
     }
 
     dateCalc = () => {
@@ -100,6 +109,7 @@ export class NewRequest extends Component {
             if (available >= 0) {
                 return this.setState({
                     numberOfDays: days,
+                    available: available,
                     error: ''
                 }, () => {this.setState({
                     loading: false
