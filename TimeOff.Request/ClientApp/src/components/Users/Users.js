@@ -9,7 +9,12 @@ export class Users extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { users: [], loading: true, user: { }, addUser: false };
+      this.state = {
+          users: [],
+          loading: true,
+          user: {},
+          addUser: false
+      };
   }
 
   componentDidMount() {
@@ -31,7 +36,7 @@ export class Users extends Component {
           {users.map(user =>
             <tr key={ user.id }>
               <td>{ user.name }</td>
-              <td>{ Moment(user.userCreated).format('LL') }</td>
+              <td>{ Moment(user.dateCreated).format('LL') }</td>
               <td>{ user.supervisor ? user.supervisor.name : 'none' }</td>
               <td>
                 <Button type="checkbox" value={ user.disabled }></Button>

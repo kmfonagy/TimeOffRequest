@@ -33,5 +33,17 @@ namespace TimeOff.Request.Domain.Shared.Entities
         public DateTimeOffset LastLogin { get; set; }
 
         public bool Disabled { get; set; }
+
+        public void SetPassword(string password) {
+            var encrypter = new Encrypter();
+
+            this.Salt = encrypter.GetSalt(password);
+            this.Hash = encrypter.GetHash(password, this.Salt);
+        }
+
+        public bool ValidatePassword(string password) {
+            var encrypter = new Encrypter();
+            return this.Hash.Equals(encrypter.GetHash(password, this.Salt));
+        }
     }
 }
