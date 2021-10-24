@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import Moment from 'moment';
 
 const updateRequest = async values => {
+    console.log('updateRequest ' + values.id)
     const url = '/api/Request/' + values.id;
     const resp = await fetch(url, {
         method: 'POST',
@@ -59,13 +60,25 @@ export class ViewRequest extends Component {
     }
 
     onInputChange(keyName, event) {
+        console.log('Key ' + keyName)
+        console.log('Value ' + event.target.value)
+        console.log('Current value ' + this.state.startDate)
         this.setState({
             [keyName]: event.target.value
-        }, () => {this.dateCalc()})
+        }, () => {
+            this.dateCalc()
+        })
     }
 
     dateCalc() {
-        let days = (this.state.endDate - this.state.startDate) / (1000 * 3600 * 24);
+        let end = Moment(this.state.endDate).format('YYYY-MM-DD');
+        let start = Moment(this.state.startDate).format('YYYY-MM-DD');
+        console.log(end)
+        console.log(start)
+        let time = Moment(end).diff(start);
+        console.log(time)
+        let days = time / (1000 * 60 * 60 * 24);
+        console.log(days)
         this.setState({
             numberOfDays: days
         })
