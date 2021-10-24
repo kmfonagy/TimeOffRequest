@@ -18,7 +18,6 @@ export class History extends Component {
             beforeDate: null,
             filter: false,
             sorted: [],
-            testId: 2
         };
 
         this.curDate = new Date();
@@ -161,8 +160,10 @@ export class History extends Component {
                             )}
                         </DropdownMenu>
                     </Dropdown>
-                    <InputGroup>
-                        <InputGroupAddon addonType="prepend" >After</InputGroupAddon>
+                </Row>
+                <Row key="2">
+                    <InputGroup className="ml-3 mb-2">
+                        <InputGroupAddon addonType="prepend">After</InputGroupAddon>
                         <Input
                             key="after"
                             id="afterDate"
@@ -182,10 +183,10 @@ export class History extends Component {
                             onChange={this.beforeDateChange}
                             style={{ maxWidth: '180px' }}
                         />
-                        <Button onClick={this.filterByDate}>Filter</Button>
+                        <Button onClick={this.filterByDate} className="ml-2">Filter</Button>
                     </InputGroup>
                 </Row>
-                <Row key="2">
+                <Row key="3">
                     {this.state.loading
                         ? <p><em>Loading...</em></p>
                         : this.renderReqsTable(this.state)}
@@ -195,7 +196,7 @@ export class History extends Component {
     }
 
     async populateRequestData() {
-        const response = await fetch('api/request/CreatedBy/' + 1);
+        const response = await fetch('api/request/CreatedBy/' + 2);
         const data = await response.json();
         if (data.length > 0) {
             this.setState({
