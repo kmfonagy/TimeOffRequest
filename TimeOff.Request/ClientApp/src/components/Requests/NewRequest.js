@@ -34,22 +34,13 @@ const updateUser = async values => {
     console.log(values);
     const url = '/api/User/' + values.user.id;
     const resp = await fetch(url, {
-        method: 'POST',
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            id: values.user.id,
-            name: values.user.name,
-            email: values.user.email,
-            dateCreated: values.user.dateCreated,
-            supervisorId: values.user.supervisorId,
-            numberOfDaysOff: values.available,
-            roles: values.user.roles,
-            passwordResetToken: values.user.passwordResetToken,
-            requiresPasswordReset: values.user.requiresPasswordReset,
-            lastLogin: values.user.lastLogin,
-            disabled: values.user.disabled
+            ...values.user,
+            numberOfDaysOff: values.available
         })
     });
     return resp.json();
