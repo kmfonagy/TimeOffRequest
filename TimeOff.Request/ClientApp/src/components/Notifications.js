@@ -29,7 +29,7 @@ export class Notifications extends Component {
             <Table dark hover striped>
                 <thead>
                     <tr>
-                        <th>Request Id</th>
+                        <th>Request</th>
                         <th>User</th>
                         <th>Notification Description</th>
                         <th>Mark Read</th>
@@ -57,16 +57,8 @@ export class Notifications extends Component {
             : Notifications.renderNotificationTable(this.state.notifications);
 
         return (
-            <div>
-                <Row>
-                    <Col>
-                        <h1 id="tableLabel">Request</h1>
-                    </Col>
-                    <h1 id="tableLabel">Description</h1>
-                    <Col>
-                    </Col>
-                </Row>
-                <p>All Notifications</p>
+            <div>                
+                <h2>All Notifications</h2>
                 {contents}
             </div>
         );
