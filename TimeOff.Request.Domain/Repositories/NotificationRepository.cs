@@ -20,7 +20,8 @@ namespace TimeOff.Request.Domain.Repositories
         {
             var notification = _db.Notifications.Where(
                 n => n.NotifyUserId == entity.NotifyUserId
-                && n.RequestId == entity.RequestId);
+                && n.RequestId == entity.RequestId
+                && n.Description.Equals(entity.Description));
 
             if (notification.Count() > 0) {
                 throw new Exception("Notification already exists.");
