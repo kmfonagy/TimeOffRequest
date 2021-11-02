@@ -19,12 +19,14 @@ namespace TimeOff.Request.Controllers
         private readonly IRequestRepository _reqRepo;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IRequestService _reqService;
+        private readonly INotificationRepository _notificationRepo;
 
-        public RequestController(IRequestRepository reqRepo, IUnitOfWork unitOfWork, IRequestService reqService)
+        public RequestController(IRequestRepository reqRepo, IUnitOfWork unitOfWork, IRequestService reqService, INotificationRepository notiRepo)
         {
             this._reqRepo = reqRepo;
             this._unitOfWork = unitOfWork;
             this._reqService = reqService;
+            this._notificationRepo = notiRepo;
         }
 
         /// <summary>
@@ -134,8 +136,19 @@ namespace TimeOff.Request.Controllers
 
                 _unitOfWork.SaveChanges();
 
+                var u = _reqRepo.Get(r.Id).CreatedBy;
+
+                _notificationRepo.Create(new NotificationEntity {
+                    RequestId = r.Id,
+                    NotifyUserId = (int)u.SupervisorId,
+                    Description = u.Name + " has requested time off."
+                });
+
+                _unitOfWork.SaveChanges();
+
                 return r.Map<Domain.Shared.Models.Request>();
             }
+
             catch (Exception ex)
             {
                 return BadRequest("Request could not be created with the provided parameters.\n " + ex.Message);
@@ -154,7 +167,55 @@ namespace TimeOff.Request.Controllers
 
             try
             {
+                var originalStart = _reqRepo.Get(id).StartDate;
+                var originalEnd = _reqRepo.Get(id).EndDate;
+
                 RequestEntity r = _reqRepo.Update(id, updatedReq.Map<RequestEntity>());
+
+                _unitOfWork.SaveChanges();
+
+                var u = _reqRepo.Get(r.Id).CreatedBy;
+
+                var desc = "No description set!";
+
+                if (r.Canceled == true)
+                {
+                    desc = u.Name + " has canceled request " + r.Id + ".";
+                    _notificationRepo.Create(new NotificationEntity
+                    {
+                        RequestId = r.Id,
+                        NotifyUserId = (int)u.SupervisorId,
+                        Description = desc
+                    });
+                }
+                else if (originalStart != r.StartDate || originalEnd != r.EndDate)
+                {
+                    desc = u.Name + " has updated request " + r.Id + ".";
+                    _notificationRepo.Create(new NotificationEntity
+                    {
+                        RequestId = r.Id,
+                        NotifyUserId = (int)u.SupervisorId,
+                        Description = desc
+                    });
+                }
+                else
+                {
+                    if (r.ApprovedById == null)
+                    {
+                        desc = "Request number " + r.Id + " was denied.";
+                    }
+                    else
+                    {
+                        desc = "Request number " + r.Id + " has been approved.";
+                    }
+
+                    _notificationRepo.Create(new NotificationEntity
+                    {
+                        RequestId = r.Id,
+                        NotifyUserId = u.Id,
+                        Description = desc
+                    });
+                }
 
                 _unitOfWork.SaveChanges();
 

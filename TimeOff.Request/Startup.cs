@@ -44,6 +44,7 @@ namespace TimeOff.Request
             services.AddScoped<IRequestService, RequestService>();
             services.AddScoped<INotificationRepository, NotificationRepository>();
             services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration => {
