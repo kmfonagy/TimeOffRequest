@@ -1,15 +1,17 @@
 import React, { Component } from 'react';
 import { Table, Button, Row } from 'reactstrap';
 import Moment from 'moment';
-import AddUser from './AddUser';
 import Col from 'reactstrap/lib/Col';
+import { Link } from 'react-router-dom';
+import { Redirect } from 'react-router';
+
 
 export class Users extends Component {
   static displayName = Users.name;
 
   constructor(props) {
     super(props);
-    this.state = { users: [], loading: true, user: { }, addUser: false };
+    this.state = { users: [], loading: true, user: {}, addUser: false };
   }
 
   componentDidMount() {
@@ -22,8 +24,10 @@ export class Users extends Component {
         <thead>
           <tr>
             <th>Name</th>
+            <th>Email</th>
             <th>Created</th>
             <th>Supervisor</th>
+            <th>Number Of Days Off</th>
             <th>Disabled</th>
           </tr>
         </thead>
@@ -31,10 +35,15 @@ export class Users extends Component {
           {users.map(user =>
             <tr key={ user.id }>
               <td>{ user.name }</td>
+              <td>{ user.email }</td>
               <td>{ Moment(user.userCreated).format('LL') }</td>
               <td>{ user.supervisor ? user.supervisor.name : 'none' }</td>
+              <td>{ user.numberOfDaysOff }</td>
               <td>
-                <Button type="checkbox" value={ user.disabled }></Button>
+                <Button type="checkbox" checked={ user.disabled }></Button>
+              </td>
+              <td>
+                <Button>Edit</Button>
               </td>
             </tr>
           )}
@@ -52,13 +61,12 @@ export class Users extends Component {
       <div>
         <Row>
           <Col>
-            <h1 id="tabelLabel" >Users</h1>
+            <h1 id="tabelLabel" >All Users</h1>
           </Col>
           <Col>
-            <h1 id="tabelLabel" >Add User</h1>
+            <Link to="/AddUser" className="btn btn-secondary">Add User</Link>
           </Col>
         </Row>
-        <p>All users</p>
         {contents}
       </div>
     );
