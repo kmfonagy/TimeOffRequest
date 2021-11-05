@@ -11,8 +11,13 @@ export class NavMenu extends Component {
 
     this.toggleNavbar = this.toggleNavbar.bind(this);
     this.state = {
-      collapsed: true
+      collapsed: true,
+      newNotifications: []
     };
+  }
+
+  componentDidMount() {
+    this.loadNotifications()
   }
 
   toggleNavbar () {
@@ -46,7 +51,7 @@ export class NavMenu extends Component {
                   <NavLink tag={Link} className="text-dark" to="/history">Requests</NavLink>
                 </NavItem>
                 <NavItem>
-                    <NavLink tag={Link} className="text-dark" to="/notifications">Notifications</NavLink>
+                    <NavLink tag={Link} className="text-dark" to="/notifications">Notifications <Badge color="danger">{ this.state.newNotifications.length }</Badge></NavLink>
                 </NavItem>
                 <NavItem>
                   <NavLink tag={Link} className="text-dark" to="/" onClick={ this.logout }>Logout</NavLink>
@@ -57,5 +62,11 @@ export class NavMenu extends Component {
         </Navbar>
       </header>
     );
+  }
+
+  async loadNotifications() {
+    const response = await fetch('/api/Notification/Unread?userId=' + JSON.parse(localStorage.getItem('user')).id)
+    const data = await response.json()
+    this.setState({ newNotifications: data })
   }
 }
