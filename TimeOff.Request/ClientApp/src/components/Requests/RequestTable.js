@@ -10,8 +10,21 @@ export class RequestTable extends Component {
         super(props);
         this.state = {
             requests: props.state.requests,
-            sorted: props.state.sorted
+            sorted: props.state.sorted,
         }
+    }
+
+    approvalStatus(req) {
+        let status = null
+        console.log(req.approvedById)
+        if (req.approvedById !== null) {
+            status = 'Approved'
+        } else if (req.canceled === true) {
+            status = 'Denied'
+        } else {
+            status = 'Awaiting Approval'
+        }
+        return status;
     }
 
     render() {
@@ -20,13 +33,13 @@ export class RequestTable extends Component {
                 <Table dark hover>
                     <thead>
                         <tr>
-                            <th>Request Number</th>
+                            <th>Request</th>
                             <th>Created Date</th>
                             <th>Approved</th>
                             <th>Start Date</th>
                             <th>End Date</th>
                             <th>Days</th>
-                            <th>Canceled</th>
+                            <th>Disabled</th>
                         </tr>
                     </thead>
 
@@ -41,16 +54,12 @@ export class RequestTable extends Component {
                                     >{req.id}</Link>
                                 </td>
                                 <td>{Moment(req.createdDate).format('LL')}</td>
-                                {req.approvedById !== null ? (
-                                    <td>Approved</td>
-                                ) : (
-                                        <td>Awaiting Approval</td>
-                                    )}
+                                <td>{this.approvalStatus(req)}</td>
                                 <td>{Moment(req.startDate).format('LL')}</td>
                                 <td>{Moment(req.endDate).format('LL')}</td>
                                 <td style={{ textAlign: 'center' }}>{req.numberOfDays}</td>
                                 <td>
-                                    <Input type="checkbox" checked={req.canceled} readOnly style={{ marginLeft: '2%' }}></Input>
+                                    <Input type="checkbox" checked={req.disabled} readOnly style={{ marginLeft: '2%' }}></Input>
                                 </td>
                             </tr>
                         )}

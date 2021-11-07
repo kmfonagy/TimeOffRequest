@@ -198,7 +198,9 @@ export class History extends Component {
     }
 
     async populateRequestData() {
-        const response = await fetch('api/request/CreatedBy/' + 2);
+        const user = localStorage.getItem('user');
+        console.log(user)
+        const response = await fetch('api/request/CreatedBy/' + user);
         const data = await response.json();
         if (data.length > 0) {
             this.setState({
