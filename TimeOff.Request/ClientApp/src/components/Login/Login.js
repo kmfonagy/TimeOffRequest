@@ -11,11 +11,11 @@ export class Login extends Component {
 
   handleSubmit = () => {
     let user = {
-      id: 2,
+      id: 1,
       email: this.state.email
     }
 
-    localStorage.setItem('user', JSON.stringify(user))
+    localStorage.setItem('user', user.id)
   }
 
   validateForm() {
