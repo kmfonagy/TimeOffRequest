@@ -48,17 +48,30 @@ export class ViewRequest extends Component {
             archived: false,
             disabled: false,
             loading: true,
-            checked: false
+            checked: false,
+            status: null
         }
 
         this.onDescriptionChange = this.onInputChange.bind(this, 'description');
         this.onCancel = this.onInputChange.bind(this, 'checked');
         this.onStartChange = this.onInputChange.bind(this, 'startDate');
-        this.onEndChange = this.onInputChange.bind(this, 'endDate')
+        this.onEndChange = this.onInputChange.bind(this, 'endDate');
     }
 
     componentDidMount() {
-        this.populateRequestData();
+        this.populateRequestData().then(this.updateStatus(this.state));
+    }
+
+    updateStatus(req) {
+        let status = null;
+        if (req.approvedById !== null) {
+            status = 'Approved'
+        } else if (req.canceled === true) {
+            status = 'Denied'
+        } else {
+            status = 'Awaiting Approval'
+        }
+        this.setState({ status })
     }
 
     onInputChange(keyName, event) {
@@ -102,11 +115,7 @@ export class ViewRequest extends Component {
                             <td style={{textAlign: 'center'}}>{state.id}</td>
                             <td>{Moment(state.createdDate).format('LL')}</td>
                             <td>
-                                {state.approvedById !== null ? (
-                                    Moment(state.approvedDate).format('LL')
-                                ) : (
-                                    'Awaiting Approval'
-                                )}
+                                {state.status}
                             </td>
                         </tr>
                     </tbody>
@@ -131,79 +140,61 @@ export class ViewRequest extends Component {
                     <thead>
                         <tr>
                             <td>Description</td>
-                            <td>Canceled</td>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td>{state.description}</td>
-                            <td>
-                                <Input type="checkbox" checked={state.canceled} disabled style={{ marginLeft: '2%' }}></Input>
-                            </td>
                         </tr>
                     </tbody>
                 </Table>
                 <div>
-                    {state.canceled === false ? (
-                        <Form style={{width: 'auto'}} className='mt-2' onSubmit={this.submitRequest}>
-                            <FormGroup>
-                                <Label for='start'>New Start Date: </Label>
-                                <Input 
-                                    key='start'
-                                    id='start'
-                                    name='start'
-                                    style={{width: '150px', textAlign: 'center'}}
-                                    type='date'
-                                    value={state.startDate}
-                                    onChange={this.onStartChange}
-                                />
-                                <Label for='end' className='mt-2'>New End Date: </Label>
-                                <Input 
-                                    key='end'
-                                    id='end'
-                                    name='end'
-                                    style={{width: '150px', textAlign: 'center'}}
-                                    type='date'
-                                    value={state.endDate}
-                                    onChange={this.onEndChange}
-                                />
-                            </FormGroup>
-                            <FormGroup>
-                                <Label for='description'>Description: </Label>
-                                <Input
-                                    type='textarea'
-                                    key='description'
-                                    id='description'
-                                    name='description'
-                                    value={state.description}
-                                    onChange={this.onDescriptionChange}
-                                />
-                            </FormGroup>
-                            <FormGroup>
-                                <Label for='canceled'>Canceled: </Label>
-                                <Input 
-                                    type='checkbox'
-                                    id='canceled'
-                                    key='canceled'
-                                    name='canceled'
-                                    value={state.canceled}
-                                    style={{marginLeft: '10px'}}
-                                    onChange={this.onCancel}
-                                />
-                            </FormGroup>
-                            <FormGroup>
+                    <Form style={{ width: 'auto' }} className='mt-2' onSubmit={this.submitRequest} >
+                        <FormGroup>
+                            <Label for='start'>New Start Date: </Label>
+                            <Input
+                                key='start'
+                                id='start'
+                                name='start'
+                                style={{ width: '150px', textAlign: 'center' }}
+                                type='date'
+                                value={state.startDate}
+                                onChange={this.onStartChange}
+                                disabled={state.canceled}
+                            />
+                            <Label for='end' className='mt-2'>New End Date: </Label>
+                            <Input
+                                key='end'
+                                id='end'
+                                name='end'
+                                style={{ width: '150px', textAlign: 'center' }}
+                                type='date'
+                                value={state.endDate}
+                                onChange={this.onEndChange}
+                                disabled={state.canceled}
+                            />
+                        </FormGroup>
+                        <FormGroup>
+                            <Label for='description'>Description: </Label>
+                            <Input
+                                type='textarea'
+                                key='description'
+                                id='description'
+                                name='description'
+                                value={state.description}
+                                onChange={this.onDescriptionChange}
+                                disabled={state.canceled}
+                            />
+                        </FormGroup>
+                        <FormGroup>
+                            {!state.canceled &&
                                 <Button
                                     id='submit'
                                     type='submit'
                                 >Submit</Button>
-                                <Button 
-                                    className='ml-2'
-                                    component={Link}
-                                    to='/history'
-                                >Cancel</Button>
-                            </FormGroup>
-                        </Form>
-                    ) : (<p>&nbsp;</p>)}
+                            }
+                        </FormGroup>
+                    </Form>
                 </div>
             </div>
         )
@@ -241,7 +232,7 @@ export class ViewRequest extends Component {
                 canceled: data.canceled,
                 archived: false,
                 disabled: false,
-                loading: false
+                loading: false 
             })
         }
     }
