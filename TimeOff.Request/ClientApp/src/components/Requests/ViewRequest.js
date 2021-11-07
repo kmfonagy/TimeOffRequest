@@ -1,6 +1,6 @@
 ﻿import React, { Component } from 'react';
 import {
-    Input, Button, Row, Form, FormGroup, Label, Table
+    Input, Button, Row, Form, FormGroup, Label, Table, FormText
 } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import Moment from 'moment';
@@ -9,25 +9,38 @@ const updateRequest = async values => {
     console.log(values.id);
     const url = '/api/Request/' + values.id;
     const resp = await fetch(url, {
-        method: 'POST',
+        method: 'PUT',
         headers: {
             'Content-type': 'application/json'
         },
         body: JSON.stringify({
             id: values.id,
             createdById: values.createdById,
-            approvedById: values.approvedById,
             description: values.description,
             createdDate: values.createdDate,
             approvedDate: values.approvedDate,
             startDate: values.startDate,
             endDate: values.endDate,
             numberOfDays: values.numberOfDays,
-            canceled: values.checked,
+            canceled: false,
             archived: false,
             disabled: false
         })
     })
+    return resp.json();
+}
+
+const udpateUser = async values => {
+    const url = '/api/User/' + values.user.id;
+    const resp = await fetch(url, {
+        method: 'PUT',
+        headers: {
+            'Content-type': 'application/json'
+        },
+        body: JSON.stringify({
+            ...values.user
+        })
+    });
     return resp.json();
 }
 
@@ -48,14 +61,18 @@ export class ViewRequest extends Component {
             archived: false,
             disabled: false,
             loading: true,
-            checked: false,
-            status: null
+            status: null,
+            days: null,
+            user: null,
+            error: null
         }
 
         this.onDescriptionChange = this.onInputChange.bind(this, 'description');
         this.onCancel = this.onInputChange.bind(this, 'checked');
         this.onStartChange = this.onInputChange.bind(this, 'startDate');
         this.onEndChange = this.onInputChange.bind(this, 'endDate');
+        this.submitRequest = this.submitRequest.bind(this);
+        this.availableDays = this.availableDays.bind(this)
     }
 
     componentDidMount() {
@@ -87,15 +104,53 @@ export class ViewRequest extends Component {
         let start = Moment(this.state.startDate).format('YYYY-MM-DD');
         let time = Moment(end).diff(start);
         let days = time / (1000 * 60 * 60 * 24);
-        this.setState({
-            numberOfDays: days
-        })
+        if (this.availableDays(days)) {
+            this.setState({
+                numberOfDays: days,
+                approvedById: null
+            })
+        }
+    }
+
+    availableDays(days) {
+        let pass = false
+        let avail = this.state.user.numberOfDaysOff
+        console.log(avail)
+        if (avail >= days) {
+            if (days > this.state.days) {
+                let diff = days - this.state.days
+                this.setState({
+                    user: {
+                        numberOfDaysOff: avail - diff
+                    }
+                })
+                pass = true
+            } else if (this.state.days > days) {
+                let diff = this.state.days - days
+                this.setState({
+                    user: {
+                        numberOfDaysOff: avail + diff
+                    }
+                })
+                pass = true
+            } else {
+                pass = true
+            }
+        } else {
+            this.setState({
+                error: 'Insufficient Avaialbe Days Off'
+            })
+        }
+
+        return pass;
     }
 
     async submitRequest(event) {
-        const values = this.state
         event.preventDefault();
-        await updateRequest(values);
+        const values = this.state
+        await updateRequest(values).then(resp => 
+            console.log(resp.id)
+        )
     }
 
     renderViewRequest(state) {
@@ -104,7 +159,7 @@ export class ViewRequest extends Component {
                 <Table dark>
                     <thead>
                         <tr>
-                            <th>Request Number</th>
+                            <th>Request</th>
                             <th>Created Date</th>
                             <th>Approved Date</th>
                         </tr>
@@ -130,7 +185,7 @@ export class ViewRequest extends Component {
                     </thead>
                     <tbody>
                         <tr>
-                            <td>{Moment(state.createdDate).format('LL')}</td>
+                            <td>{Moment(state.startDate).format('LL')}</td>
                             <td>{Moment(state.endDate).format('LL')}</td>
                             <td style={{textAlign: 'center'}}>{state.numberOfDays}</td>
                         </tr>
@@ -140,16 +195,22 @@ export class ViewRequest extends Component {
                     <thead>
                         <tr>
                             <td>Description</td>
+                            <td>Remaining Days</td>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td>{state.description}</td>
+                            <td>{state.user.numberOfDaysOff}</td>
                         </tr>
                     </tbody>
                 </Table>
                 <div>
                     <Form style={{ width: 'auto' }} className='mt-2' onSubmit={this.submitRequest} >
+                        {
+                            this.state.error &&
+                            <FormText invalid>{this.state.error}</FormText>
+                        }
                         <FormGroup>
                             <Label for='start'>New Start Date: </Label>
                             <Input
@@ -216,6 +277,9 @@ export class ViewRequest extends Component {
 
     async populateRequestData() {
         const id = this.props.match.params.id;
+        const resp = await fetch ('api/User/' + id);
+        const user = await resp.json();
+        console.log(user)
         const response = await fetch('api/Request/' + id);
         const data = await response.json();
         if (data !== null) {
@@ -229,10 +293,12 @@ export class ViewRequest extends Component {
                 startDate: data.startDate,
                 endDate: data.endDate,
                 numberOfDays: data.numberOfDays,
+                days: data.numberOfDays,
                 canceled: data.canceled,
                 archived: false,
                 disabled: false,
-                loading: false 
+                loading: false,
+                user: user 
             })
         }
     }
