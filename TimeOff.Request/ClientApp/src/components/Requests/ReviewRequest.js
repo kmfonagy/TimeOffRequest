@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-    Input, Button, Row, Table
+    Input, Button, Row, Table, Form, FormGroup
 } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import Moment from 'moment';
@@ -9,12 +9,22 @@ const updateRequest = async values => {
     console.log(values);
     const url = '/api/Request/' + values.id;
     const resp = await fetch(url, {
-        meothd: 'PUT',
+        method: 'PUT',
         headers: {
             'Content-type': 'application/json'
         },
         body: JSON.stringify({
-            ...values
+            id: values.id,
+            createdBy: values.createdById,
+            approvedById: values.userId,
+            description: values.description,
+            createdDate: values.createdDate,
+            startDate: values.startDate,
+            endDate: values.endDate,
+            numberOfDays: values.numberOfDays,
+            canceled: values.canceled,
+            archived: values.archived,
+            disabled: values.disabled
         })
     })
     return resp.json();
@@ -28,10 +38,19 @@ export class ReviewRequest extends Component {
             status: null,
             admin: false,
             userId: null,
-            loading: true
+            loading: true,
+            disabled: false,
+            archived: false,
+            approved: null,
+            canceled: false,
+            show: false
         }
 
         this.onApprove = this.onApprove.bind(this)
+        this.onDeny = this.onDeny.bind(this)
+        this.onDisable = this.onDisable.bind(this)
+        this.onArchive = this.onArchive.bind(this)
+        this.onSubmit = this.onSubmit.bind(this)
     }
 
     componentDidMount() {
@@ -41,33 +60,71 @@ export class ReviewRequest extends Component {
 
     updateStatus() {
         let status = null
+        let show = false
+        let approved = this.state.request.approvedById
+        let canceled = this.state.request.canceled
+        let archived = this.state.request.archive
+        let disabled = this.state.request.disabled
+
         if (this.state.request.approvedById === null) {
             status = 'Awaiting Approval'
         } else if (this.state.request.canceled === true) {
             status = 'Denied'
         }
-        this.setState({ status })
+
+        if (this.state.request.approvedById === null && !this.state.request.canceled){
+            show = true
+        } else if (!this.state.request.disabled) {
+            show = true
+        } else if (!this.state.request.archive) {
+            show = true
+        }
+
+        this.setState({ status, show, approved, canceled, archived, disabled })
     }
 
-    async onApprove(event) {
+    onApprove() {
+        this.setState({
+            approved: this.state.userId,
+            status: 'Approved'
+        })
+    }
+
+    onDeny() {
+        this.setState({
+            canceled: true,
+            status: 'Denied'
+        })
+    }
+
+    onDisable() {
+        this.setState({
+            disabled: true
+        })
+    }
+
+    onArchive() {
+        this.setState({
+            archive: true
+        })
+    }
+
+    async onSubmit(event) {
         event.preventDefault();
         const values = {
             id: this.state.request.id,
             createdBy: this.state.request.createdById,
-            approvedById: this.state.userId,
+            approvedById: this.state.approved,
             description: this.state.request.description,
             createdDate: this.state.request.createdDate,
-            approvedDate: new Date(),
             startDate: this.state.request.startDate,
             endDate: this.state.request.endDate,
             numberOfDays: this.state.request.numberOfDays,
-            canceled: false,
-            archived: false,
-            disabled: false
+            canceled: this.state.canceled,
+            archived: this.state.archived,
+            disabled: this.state.disabled
         }
-        await updateRequest(values).then(
-
-        )
+        await updateRequest(values);
     }
 
     renderReviewRequest(state) {
@@ -133,20 +190,41 @@ export class ReviewRequest extends Component {
                         </tr>
                     </tbody>
                 </Table>
-                <Row>
-                    {(state.request.approvedById === null && state.request.canceled === false) && 
-                        <Button className="m-2 ml-3">Approve</Button>
-                    }
-                    {(state.request.approvedById === null && state.request.canceled === false) && 
-                        <Button className="m-2">Deny</Button>
-                    }
-                    {(state.admin === true && state.request.disabled === false) &&
-                        <Button className="m-2">Disabled</Button>
-                    }
-                    {(state.admin === true && state.request.archived === false) &&
-                        <Button className="m-2">Archived</Button>
-                    }
-                </Row>
+                <Form style={{width: 'auto'}} className='ml-1' onSubmit={this.onSubmit}>
+                    <FormGroup>
+                        {(state.request.approvedById === null && !state.request.canceled) &&
+                            <Button
+                                className="m-2"
+                                onClick={this.onApprove}
+                            >Approve</Button>
+                        }
+                        {(state.request.approvedById === null && !state.request.canceled) &&
+                            <Button
+                                className="m-2"
+                                onClick={this.onDeny}
+                            >Deny</Button>
+                        }
+                        {(state.admin && !state.request.disabled) &&
+                            <Button
+                                className="m-2"
+                                onClick={this.onDisable}
+                            >Disabled</Button>
+                        }
+                        {(state.admin && !state.request.archived) &&
+                            <Button
+                                className="m-2"
+                                onClick={this.onArchive}
+                            >Archived</Button>
+                        }
+                        {state.show &&
+                            <Button
+                                className='m-2'
+                                id='submit'
+                                type='submit'
+                            >Submit</Button>
+                        }
+                    </FormGroup>
+                </Form>
             </div>
         )
     }
@@ -173,15 +251,16 @@ export class ReviewRequest extends Component {
         const response1 = await fetch('api/User/' + userId)
         const data1 = await response1.json();
         const isAdmin = data1.roles === 'Administrator'
-
         const response2 = await fetch('api/Request/' + id);
         const data2 = await response2.json();
+        console.log(data2)
         if (data2 !== null) {
             this.setState({
                 request: data2,
                 loading: false,
                 admin: isAdmin,
-                userId: userId
+                userId: userId,
+                date: data2.approvedDate
             })
         }
     }
