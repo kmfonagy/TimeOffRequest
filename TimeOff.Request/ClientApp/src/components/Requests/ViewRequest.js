@@ -148,9 +148,7 @@ export class ViewRequest extends Component {
     async submitRequest(event) {
         event.preventDefault();
         const values = this.state
-        await updateRequest(values).then(resp => 
-            console.log(resp.id)
-        )
+        await updateRequest(values)
     }
 
     renderViewRequest(state) {
