@@ -1,5 +1,5 @@
 ﻿import React, { Component } from 'react';
-import { Collapse, Container, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink } from 'reactstrap';
+import { Collapse, Container, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink, Badge } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import './NavMenu.css';
 
@@ -11,14 +11,25 @@ export class NavMenu extends Component {
 
     this.toggleNavbar = this.toggleNavbar.bind(this);
     this.state = {
-      collapsed: true
+      collapsed: true,
+      newNotifications: []
     };
+  }
+
+  componentDidMount() {
+    this.loadNotifications()
   }
 
   toggleNavbar () {
     this.setState({
       collapsed: !this.state.collapsed
     });
+  }
+
+  logout = () => {
+    localStorage.removeItem('user')
+    localStorage.clear()
+    window.location.reload()
   }
 
   render () {
@@ -34,13 +45,16 @@ export class NavMenu extends Component {
                   <NavLink tag={Link} className="text-dark" to="/">Home</NavLink>
                 </NavItem>
                 <NavItem>
-                  <NavLink tag={Link} className="text-dark" to="/counter">Counter</NavLink>
-                </NavItem>
-                <NavItem>
-                  <NavLink tag={Link} className="text-dark" to="/fetch-data">Fetch data</NavLink>
-                </NavItem>
-                <NavItem>
                   <NavLink tag={Link} className="text-dark" to="/users">Users</NavLink>
+                </NavItem>
+                <NavItem>
+                  <NavLink tag={Link} className="text-dark" to="/history">Requests</NavLink>
+                </NavItem>
+                <NavItem>
+                    <NavLink tag={Link} className="text-dark" to="/notifications">Notifications <Badge color="danger">{ this.state.newNotifications.length > 0 ? this.state.newNotifications.length : null }</Badge></NavLink>
+                </NavItem>
+                <NavItem>
+                  <NavLink tag={Link} className="text-dark" to="/" onClick={ this.logout }>Logout</NavLink>
                 </NavItem>
               </ul>
             </Collapse>
@@ -48,5 +62,11 @@ export class NavMenu extends Component {
         </Navbar>
       </header>
     );
+  }
+
+  async loadNotifications() {
+    const response = await fetch('/api/Notification/Unread?userId=' + JSON.parse(localStorage.getItem('user')).id)
+    const data = await response.json()
+    this.setState({ newNotifications: data })
   }
 }
