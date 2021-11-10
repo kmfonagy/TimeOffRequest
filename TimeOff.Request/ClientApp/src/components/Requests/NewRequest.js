@@ -179,7 +179,7 @@ export class NewRequest extends Component {
     }
 
     async populateRequestDate() {
-        const response = await fetch('api/User/' + 1);
+        const response = await fetch('api/User/' + JSON.parse(localStorage.getItem('user')).id);
         const data = await response.json();
         if (data !== null) {
             this.setState({

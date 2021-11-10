@@ -25,10 +25,23 @@ namespace TimeOff.Request
 
         public IConfiguration Configuration { get; }
 
+        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services) {
 
             var connectionString = Configuration.GetConnectionString("TimeOffConnectionString");
+
+            services.AddCors(options => {
+                options.AddPolicy(name: MyAllowSpecificOrigins,
+                                  builder => {
+                                      builder.WithOrigins("http://example.com",
+                                                          "http://www.contoso.com")
+                                                          .AllowAnyHeader()
+                                                          .AllowAnyMethod()
+                                                          .AllowAnyOrigin();
+                                  });
+            });
 
             services.AddControllersWithViews();
 
@@ -63,6 +76,8 @@ namespace TimeOff.Request
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
+
+            app.UseCors(MyAllowSpecificOrigins);
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();

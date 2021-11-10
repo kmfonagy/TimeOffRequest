@@ -37,8 +37,8 @@ export class Home extends Component {
             <p>Days Remaining: { this.state.user.numberOfDaysOff }</p>
           </Col>
           <Col>
-            <p>Supervisor: { this.state.user.supervisor.name }</p>
-            <p>Supervisor Email: { this.state.user.supervisor.email }</p>
+            <p>Supervisor: { this.state.user.supervisor === null ? 'No supervisor' :  this.state.user.supervisor.name }</p>
+            <p>Supervisor Email: { this.state.user.supervisor === null ? 'No supervisor' :  this.state.user.supervisor.name }</p>
           </Col>
         </Row>
       </div>

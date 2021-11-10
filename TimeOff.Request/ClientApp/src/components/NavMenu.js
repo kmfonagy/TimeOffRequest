@@ -51,7 +51,7 @@ export class NavMenu extends Component {
                   <NavLink tag={Link} className="text-dark" to="/history">Requests</NavLink>
                 </NavItem>
                 <NavItem>
-                    <NavLink tag={Link} className="text-dark" to="/notifications">Notifications <Badge color="danger">{ this.state.newNotifications.length }</Badge></NavLink>
+                    <NavLink tag={Link} className="text-dark" to="/notifications">Notifications <Badge color="danger">{ this.state.newNotifications.length > 0 ? this.state.newNotifications.length : null }</Badge></NavLink>
                 </NavItem>
                 <NavItem>
                   <NavLink tag={Link} className="text-dark" to="/" onClick={ this.logout }>Logout</NavLink>

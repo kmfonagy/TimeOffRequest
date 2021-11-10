@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Redirect } from 'react-router';
 import { Input, Form, Button, FormGroup, Label, Card, CardImg, CardBody, CardTitle, CardSubtitle } from 'reactstrap';
 
 export class Login extends Component {
@@ -6,26 +7,25 @@ export class Login extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { email: '', password: '', user: null, users: [] }
+    this.state = { email: '', password: '', user: null, users: [], redirect: false, error: false }
 
     this.handleSubmit = this.handleSubmit.bind(this)
   }
 
   async handleSubmit() {
-    const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: this.state.email, password: this.state.password })
+    this.setState({ error: false })
+
+    const response = await fetch('https://localhost:5001/api/user/')
+    const data = await response.json()
+    console.log(data)
+    let user = data.filter(user => user.email === this.state.email)
+    
+    if (user[0].id > 0) {
+      localStorage.setItem('user', JSON.stringify(user[0]))
+      this.setState({ redirect: true })
+    } else {
+      this.setState({ error: true })
     }
-
-    console.log(requestOptions)
-
-    fetch('/api/Authentication', requestOptions)
-      .then(response => response.json())
-      .then(data => localStorage.setItem('user', JSON.stringify(data)))
-      .catch((e) => {
-        console.log(e.message)
-      })
   }
 
   validateForm() {
@@ -33,6 +33,10 @@ export class Login extends Component {
   }
 
   render() {
+    if (this.state.redirect) {
+      return <Redirect to='/' />
+    }
+
     return (
       <div style={{ padding: '60px 0' }}>
         <Card style={ {margin: '0 auto', maxWidth: '320px', marginBottom: '30px' }}>
@@ -73,9 +77,10 @@ export class Login extends Component {
               <Button block size="lg" type="submit" disabled={ !this.validateForm() }>
                 Login
               </Button>
+              <p className="text-danger">{ this.state.error ? 'Login or Password are incorect.' : null }</p>
             </Form>
           </CardBody>
-        </Card>`
+        </Card>
       </div>
       )
   }
