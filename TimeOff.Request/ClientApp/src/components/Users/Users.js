@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-import { Table, Button, Row } from 'reactstrap';
+import { Table, Button, Row, Input } from 'reactstrap';
 import Moment from 'moment';
 import Col from 'reactstrap/lib/Col';
 import { Link } from 'react-router-dom';
 import { Redirect } from 'react-router';
-
 
 export class Users extends Component {
   static displayName = Users.name;
@@ -15,12 +14,17 @@ export class Users extends Component {
           users: [],
           loading: true,
           user: {},
-          addUser: false
+          addUser: false,
+          currentUser: null
       };
   }
 
   componentDidMount() {
     this.populateUserData();
+    this.setState({ currentUser: JSON.parse(localStorage.getItem('user')).email },
+      () => {
+        console.log(this.state.currentUser)
+      })
   }
 
   static renderUsersTable(users) {
@@ -28,28 +32,37 @@ export class Users extends Component {
       <Table dark hover>
         <thead>
           <tr>
+            <th>Id</th>
             <th>Name</th>
             <th>Email</th>
             <th>Created</th>
             <th>Supervisor</th>
-            <th>Number Of Days Off</th>
+            <th>Days Remaining</th>
+            <th>Role</th>
             <th>Disabled</th>
           </tr>
         </thead>
         <tbody>
           {users.map(user =>
             <tr key={ user.id }>
+              <td>{ user.id }</td>
               <td>{ user.name }</td>
-<<<<<<< HEAD
               <td>{ user.email }</td>
               <td>{ Moment(user.userCreated).format('LL') }</td>
-              <td>{ user.email }</td>
-              <td>{ Moment(user.userCreated).format('LL') }</td>
-              <td>
-                <Button type="checkbox" checked={ user.disabled }></Button>
+              <td>{ user.supervisor === null ? 'No Supervisor' : user.supervisor.name }</td>
+              <td>{ user.numberOfDaysOff }</td>
+              <td>{ user.roles }</td>
+              <td className="text-center">
+                <Input type="checkbox" checked={ user.disabled } readOnly></Input>
               </td>
               <td>
-                <Button>Edit</Button>
+                {
+                  user.email === JSON.parse(localStorage.getItem('user')).email ?
+                  null :
+                  <Link to={{ pathname: '/AddUser', state: { type: 'Edit', user: user }}} className="btn btn-secondary">
+                    Edit
+                  </Link>
+                }
               </td>
             </tr>
           )}
@@ -69,8 +82,8 @@ export class Users extends Component {
           <Col>
             <h1 id="tabelLabel" >All Users</h1>
           </Col>
-          <Col>
-            <Link to="/AddUser" className="btn btn-secondary">Add User</Link>
+          <Col className="text-right">
+            <Link to={{ pathname: '/AddUser', state: { type: 'Add' }}} className="btn btn-secondary" >Add User</Link>
           </Col>
         </Row>
         {contents}
@@ -81,7 +94,6 @@ export class Users extends Component {
   async populateUserData() {
     const response = await fetch('api/user');
     const data = await response.json();
-    console.log(data)
     if (data.length > 0) {
         this.setState({ users: data, loading: false });
     }

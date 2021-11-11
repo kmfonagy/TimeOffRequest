@@ -12,12 +12,14 @@ export class NavMenu extends Component {
     this.toggleNavbar = this.toggleNavbar.bind(this);
     this.state = {
       collapsed: true,
-      newNotifications: []
+      newNotifications: [],
+      currentUser: null
     };
   }
 
   componentDidMount() {
     this.loadNotifications()
+    this.setState({ currentUser: JSON.parse(localStorage.getItem('user')) })
   }
 
   toggleNavbar () {
@@ -44,9 +46,13 @@ export class NavMenu extends Component {
                 <NavItem>
                   <NavLink tag={Link} className="text-dark" to="/">Home</NavLink>
                 </NavItem>
-                <NavItem>
-                  <NavLink tag={Link} className="text-dark" to="/users">Users</NavLink>
-                </NavItem>
+                {
+                  JSON.parse(localStorage.getItem('user')).roles === 'Administrator' ?
+                  <NavItem>
+                    <NavLink tag={Link} className="text-dark" to="/users">Users</NavLink>
+                  </NavItem>
+                  : null
+                }
                 <NavItem>
                   <NavLink tag={Link} className="text-dark" to="/history">Requests</NavLink>
                 </NavItem>

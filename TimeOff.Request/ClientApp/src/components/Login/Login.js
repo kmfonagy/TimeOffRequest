@@ -18,7 +18,7 @@ export class Login extends Component {
     const response = await fetch('https://localhost:5001/api/user/')
     const data = await response.json()
     console.log(data)
-    let user = data.filter(user => user.email === this.state.email)
+    let user = data.filter(user => user.email === this.state.email && !user.disabled)
     
     if (user[0].id > 0) {
       localStorage.setItem('user', JSON.stringify(user[0]))
