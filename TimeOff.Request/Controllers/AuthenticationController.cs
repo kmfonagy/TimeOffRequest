@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using TimeOff.Request.Domain.Shared.Models;
 using TimeOff.Request.Domain.Shared.Repositories;
 using TimeOff.Request.Domain.Shared.Services;
+using TimeOff.Request.Helpers;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -38,16 +39,14 @@ namespace TimeOff.Request.Controllers
         /// <returns>Authenticated user.</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult<User> Login(UserLogin login) {
             try {
                 var user = authenticationService.Authenticate(login);
                 if (user != null) {
-                    return user;
+                    return user.Map<User>();
                 }
                 else {
-                    return Unauthorized();
+                    return BadRequest();
                 }
             }
             catch (Exception ex) {
@@ -68,7 +67,7 @@ namespace TimeOff.Request.Controllers
             try {
                 var user = authenticationService.Register(registerUser);
                 if (user != null) {
-                    return user;
+                    return user.Map<User>();
                 }
                 else {
                     return Unauthorized();

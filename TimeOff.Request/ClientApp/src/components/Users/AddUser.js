@@ -1,83 +1,217 @@
-import React, { useState } from 'react';
-import { Col, Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
+import React, { Component } from 'react';
+import { Col, Button, Form, FormGroup, Label, Input, Row } from 'reactstrap';
+import { Redirect } from 'react-router';
 
-const AddUser = (props) => {
-  const [user, setUser] = useState({
-    name: '',
-    email: '',
-    supervisorId: null,
-    role: '',
-    password: '',
-    disabled: false
-  })
+export class AddUser extends Component {
+    static displayName = AddUser.name
 
-  const handleChange = (e) => {
-    setUser({ user: {[e.target.name]: e.target.value }})
-  }
+    constructor(props) {
+        super(props);
+        this.state = {
+            user: props.location.state.type === 'Add' ?
+                {
+                    name: '',
+                    email: '',
+                    supervisorId: null,
+                    numberOfDaysOff: 0,
+                    roles: '',
+                    password: '',
+                    disabled: false
+                } : 
+                props.location.state.user,
+            users: [],
+            userAdded: false,
+            type: props.location.state.type
+        }
 
-  const handleSubmit = () => {
-    console.log(this.state.user)
-  }
+        this.handleSubmit = this.handleSubmit.bind(this)
+        this.handleCancel = this.handleCancel.bind(this)
+        this.handleEdit = this.handleEdit.bind(this)
+    }
 
-  return (
-    <Form>
-      <FormGroup row>
-        <Label for="email" sm={2}>Email</Label>
-        <Col sm={10}>
-          <Input 
-            type="email"
-            name="email"
-            id="email"
-            onChange={ handleChange }
-            placeholder="Email address" />
-        </Col>
-      </FormGroup>
-      <FormGroup row>
-        <Label for="password" sm={2}>Password</Label>
-        <Col sm={10}>
-          <Input 
-            type="password"
-            name="password"
-            id="password"
-            onChange={ handleChange }
-            placeholder="Password" />
-        </Col>
-      </FormGroup>
-      <FormGroup row>
-        <Label for="role" sm={2}>Select Role</Label>
-        <Col sm={10}>
-          <Input 
-            type="select"
-            name="role"
-            id="role" 
-            onChange={ handleChange }
-            single>
-            <option>User</option>
-            <option>Administrator</option>
-          </Input>
-        </Col>
-      </FormGroup>
-      <FormGroup row>
-        <Col sm={{ size: 10 }}>
-          <FormGroup check>
-            <Label check>
-              <Input 
-                type="checkbox" 
-                id="disabled" 
-                onChange={ handleChange }
-                name= "disabled"/>{' '}
-              Disabled
-            </Label>
-          </FormGroup>
-        </Col>
-      </FormGroup>
-      <FormGroup check row>
-        <Col sm={{ size: 10, offset: 2 }}>
-          <Button onClick={ handleSubmit }>Submit</Button>
-        </Col>
-      </FormGroup>
-    </Form>
-  );
+    componentDidMount() {
+        this.populateUserData()
+    }
+
+    handleChange = (e) => {
+        if (e.target.name === 'disabled') {
+            this.setState({ user: {...this.state.user, disabled: !this.state.user.disabled}})
+        } else {
+            this.setState({ user: { ...this.state.user, [e.target.name]: e.target.value } })
+        }
+    }
+
+    async handleSubmit(event) {
+        event.preventDefault()
+
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                ...this.state.user, 
+                supervisorId: parseInt(this.state.user.supervisorId),
+                numberOfDaysOff: parseFloat(this.state.user.numberOfDaysOff)
+            })
+        };
+
+        const response = await fetch('https://Localhost:5001/api/user', requestOptions);
+        if (response.ok) {
+            this.setState({ userAdded: true })
+        }
+    }
+
+    async handleEdit(event) {
+        event.preventDefault()
+
+        console.log(this.state.user)
+
+        const requestOptions = {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                ...this.state.user, 
+                supervisorId: parseInt(this.state.user.supervisorId),
+                numberOfDaysOff: parseFloat(this.state.user.numberOfDaysOff)
+            })
+        };
+
+        const response = await fetch('https://Localhost:5001/api/user/' + this.state.user.id, requestOptions);
+        if (response.ok) {
+            this.setState({ userAdded: true })
+        }
+    }
+
+    handleCancel(event) {
+        this.setState({ userAdded: true })
+    }
+
+    render() {
+
+        if (this.state.userAdded) {
+            return <Redirect to= "/users" />
+        }
+
+        return (
+            <Form>
+                <h1>{ this.state.type } User</h1>
+                <FormGroup row>
+                    <Label for="name" sm={2}>Name</Label>
+                    <Col sm={10}>
+                        <Input
+                            type="text"
+                            name="name"
+                            id="name"
+                            onChange={ this.handleChange }
+                            placeholder="Name"
+                            value={ this.state.user.name } />
+                    </Col>
+                </FormGroup>
+
+                <FormGroup row>
+                    <Label for="email" sm={2}>Email</Label>
+                    <Col sm={10}>
+                        <Input
+                            type="text"
+                            name="email"
+                            id="email"
+                            onChange={ this.handleChange }
+                            placeholder="Email address"
+                            value={ this.state.user.email } />
+                    </Col>
+                </FormGroup>
+
+                <FormGroup row>
+                    <Label for="password" sm={2}>Password</Label>
+                    <Col sm={10}>
+                        <Input
+                            type="password"
+                            name="password"
+                            id="password"
+                            onChange={ this.handleChange }
+                            placeholder="Password"
+                            value={ this.state.user.password } />
+                    </Col>
+                </FormGroup>
+
+                <FormGroup row>
+                    <Label for="supervisorId" sm={2}>Select Supervisor</Label>
+                    <Col sm={10}>
+                        <Input
+                            type="select"
+                            value={ this.state.user.supervisorId === null ? 'Select Supervisor' : this.state.user.supervisorId }
+                            name="supervisorId"
+                            id="supervisorId"
+                            onChange={ this.handleChange }>
+                            <option>Select Supervisor</option>
+                            { this.state.users.map((user) =>
+                                <option value={ user.id } key={ user.id } > { user.name } </option>
+                            )}
+                        </Input>
+                    </Col>
+                </FormGroup>
+
+                <FormGroup row>
+                    <Label for="numberOfDaysOff" sm={2}>Number Of Days Off</Label>
+                    <Col sm={10}>
+                        <Input
+                            type="number"
+                            name="numberOfDaysOff"
+                            id="numberOfDaysOff"
+                            value={ this.state.user.numberOfDaysOff }
+                            onChange={this.handleChange}
+                            placeholder="Number of days off" />
+                    </Col>
+                </FormGroup>
+
+                <FormGroup row>
+                    <Label for="role" sm={2}>Select Role</Label>
+                    <Col sm={10}>
+                        <Input
+                            type="select"
+                            value={ this.state.user.roles === null ? 'Select Role' : this.state.user.roles }
+                            name="roles"
+                            id="roles"
+                            onChange={ this.handleChange }>
+                            <option>Select Role</option>
+                            <option>User</option>
+                            <option>Administrator</option>
+                        </Input>
+                    </Col>
+                </FormGroup>
+
+                <FormGroup row>
+                    <Col sm={{ size: 10 }}>
+                        <FormGroup check>
+                            <Label check>
+                                <Input
+                                    type="checkbox"
+                                    id="disabled"
+                                    defaultChecked={ this.state.user.disabled }
+                                    onClick={this.handleChange}
+                                    name="disabled" />
+                                Disabled
+                            </Label>
+                        </FormGroup>
+                    </Col>
+                </FormGroup>
+
+                <FormGroup check row>
+                    <Row className="m-auto">
+                        <Col>
+                            <Button onClick={ this.state.type === 'Edit' ? this.handleEdit : this.handleSubmit } className="m-1">{ this.state.type === 'Edit' ? 'Update User' : 'Submit'}</Button>
+                            <Button onClick={ this.handleCancel } className="m-1">Cancel</Button>
+                        </Col>
+                    </Row>
+                </FormGroup>
+            </Form>
+        );
+    }
+
+    async populateUserData() {
+        const response = await fetch('api/user');
+        const data = await response.json();
+        if (data.length > 0) {
+            this.setState({ users: data, loading: false });
+        }
+    }
 }
-
-export default AddUser;
