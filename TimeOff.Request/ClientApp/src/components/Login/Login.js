@@ -15,7 +15,7 @@ export class Login extends Component {
       email: this.state.email
     }
 
-      localStorage.setItem('user', user.id)
+    localStorage.setItem('user', JSON.stringify(user))
   }
 
   validateForm() {
