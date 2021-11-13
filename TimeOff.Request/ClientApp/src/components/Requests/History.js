@@ -202,9 +202,10 @@ export class History extends Component {
     }
 
     async populateRequestData() {
-        const user = 2 //localStorage.getItem('user');
+        const user = JSON.parse(localStorage.getItem('user')).id;
         const response = await fetch('api/request/CreatedBy/' + user);
         const data = await response.json();
+        
         if (data.length > 0) {
             this.setState({
                 requests: data.sort((a, b) => b.id < a.id ? 1 : -1),

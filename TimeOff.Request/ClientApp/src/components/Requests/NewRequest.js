@@ -207,11 +207,12 @@ export class NewRequest extends Component {
     }
 
     async populateRequestDate() {
-        const userId = 2 // JSON.parse(localStorage.getItem('user')).id
+        const userId = JSON.parse(localStorage.getItem('user')).id
         const response1 = await fetch('api/User/' + userId);
         const data1 = await response1.json();
         const response2 = await fetch('api/Request/')
         const data2 = await response2.json()
+        
         if (data1 !== null && data2 !== null) {
             this.setState({
                 user: data1,

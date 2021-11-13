@@ -270,7 +270,7 @@ export class ViewRequest extends Component {
 
     async populateRequestData() {
         const id = this.props.match.params.id;
-        const user = 2 //localStorage.getItem('user');
+        const user = JSON.parse(localStorage.getItem('user')).id;
         const response1 = await fetch('api/Request/' + id);
         const data1 = await response1.json();
         const response2 = await fetch('api/User/' + user);
