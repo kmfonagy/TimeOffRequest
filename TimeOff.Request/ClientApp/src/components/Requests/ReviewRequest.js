@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import {
-    Input, Button, Row, Table, Form, FormGroup
+    Input, Button, Row, Table, Form, FormGroup, Spinner
 } from 'reactstrap';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import Moment from 'moment';
 
 const updateRequest = async values => {
@@ -13,17 +13,7 @@ const updateRequest = async values => {
             'Content-type': 'application/json'
         },
         body: JSON.stringify({
-            id: values.id,
-            createdBy: values.createdById,
-            approvedById: values.userId,
-            description: values.description,
-            createdDate: values.createdDate,
-            startDate: values.startDate,
-            endDate: values.endDate,
-            numberOfDays: values.numberOfDays,
-            canceled: values.canceled,
-            archived: values.archived,
-            disabled: values.disabled
+            ...values
         })
     })
     return resp.json();
@@ -37,10 +27,10 @@ const updateUser = async values => {
             'Content-type': 'application/json'
         },
         body: JSON.stringify({
-            ...values.requester
+            ...values
         })
     })
-    return resp.json();
+    return resp.json()
 }
 
 export class ReviewRequest extends Component {
@@ -55,11 +45,13 @@ export class ReviewRequest extends Component {
             disabled: false,
             archived: false,
             approved: null,
+            approvedDate: null,
             canceled: false,
             show: false,
-            active: null,
-            sorted: [],
-            requester: null
+            redirect: false,
+            error: false,
+            requestor: null,
+            sorted: []
         }
 
         this.onApprove = this.onApprove.bind(this)
@@ -81,6 +73,7 @@ export class ReviewRequest extends Component {
         let canceled = this.state.request.canceled
         let archived = this.state.request.archive
         let disabled = this.state.request.disabled
+        let approvedDate = this.state.request.approvedDate
         let sorted = this.state.active.filter(r => r.createdById !== this.state.request.createdById)
         
         if (this.state.request.approvedById === null) {
@@ -97,59 +90,86 @@ export class ReviewRequest extends Component {
             show = true
         }
 
-        this.setState({ status, show, approved, canceled, archived, disabled, sorted })
+        this.setState({ status, show, approved, canceled, archived, disabled, approvedDate, sorted })
     }
 
     onApprove() {
         this.setState({
             approved: this.state.userId,
+            approvedDate: Moment(new Date()).format(Moment.HTML5_FMT.DATETIME_LOCAL_MS),
+            archive: false,
+            canceled: false,
+            disabled: false,
             status: 'Approved'
         })
     }
 
     onDeny() {
-        const days = this.state.request.numberOfDays
-        const daysOff = this.state.requester.numberOfDaysOff
         this.setState({
+            approved: null,
+            approvedDate: this.state.request.createdDate,
+            archive: false,
             canceled: true,
-            status: 'Denied',
-            requester: {
-                numberOfDaysOff: days + daysOff
-            }
+            disabled: false,
+            status: 'Denied'
         })
     }
 
     onDisable() {
         this.setState({
-            disabled: true
+            disabled: true,
         })
     }
 
     onArchive() {
         this.setState({
-            archive: true
+            archive: true,
         })
     }
 
     async onSubmit(event) {
         event.preventDefault();
-        if (this.state.canceled) {
-            await updateUser(this.state)
-        }
         const values = {
-            id: this.state.request.id,
-            createdBy: this.state.request.createdById,
+            ...this.state.request,
             approvedById: this.state.approved,
-            description: this.state.request.description,
-            createdDate: this.state.request.createdDate,
-            startDate: this.state.request.startDate,
-            endDate: this.state.request.endDate,
-            numberOfDays: this.state.request.numberOfDays,
-            canceled: this.state.canceled,
+            disabled: this.state.disabled,
             archived: this.state.archived,
-            disabled: this.state.disabled
+            approvedDate: this.state.approvedDate,
+            canceled: this.state.canceled
         }
-        await updateRequest(values);
+
+        if (this.state.canceled) {
+            let avail = this.state.requestor.numberOfDaysOff
+            let req = this.state.request.numberOfDays
+            let days = avail + req
+            const user = {
+                ...this.state.requestor,
+                numberOfDaysOff: days
+            }
+
+            await updateUser(user).then((resp) => {
+                if (resp.numberOfDaysOff !== days) {
+                    this.setState({
+                        error: true
+                    })
+                    return
+                }
+            });
+        }
+
+        await updateRequest(values).then((resp) => {
+            if (resp.id === values.id) {
+                this.redirect()
+            } else {
+                this.setState({
+                    error: true
+                })
+            }
+        })
+    }
+
+    redirect() {
+        this.setState({redirect: true})
     }
 
     renderReviewRequest(state) {
@@ -291,16 +311,18 @@ export class ReviewRequest extends Component {
     render() {
         return (
             <div>
-                <Row key='0' className='mb-2'>
+                { this.state.redirect ? (<Redirect push to={`/review-requests`} />) : null }
+                { this.error && <Row key='0'><p style={{color: 'red'}}>Unable to complete request</p></Row>}
+                <Row key='1' className='mb-2'>
                     <Link to={`/review-requests`}>&laquo; Return to Review Requests</Link>
                 </Row>
-                <Row key='1'>
+                <Row key='2'>
                     {this.state.loading 
-                        ? <p><em>Loading Request...</em></p>
+                        ? <Spinner>Loading...</Spinner>
                         : this.renderReviewRequest(this.state)
                     }
                 </Row>
-                <Row key='2' style={{marginTop: 4}}>
+                <Row key='3' style={{marginTop: 4}}>
                     <div>
                         {!this.state.loading && this.returnActiveRequest(this.state)
                         }
@@ -312,17 +334,17 @@ export class ReviewRequest extends Component {
 
     async populateRequestData() {
         const id = this.props.match.params.id;
-        const userId = Number.parseInt(localStorage.getItem('user'), 10);
-        const curDate = Moment(new Date()).format('LL')
+        const userId = 1  // localStorage.getItem('user');
         const response1 = await fetch('api/User/' + userId)
         const data1 = await response1.json();
         const isAdmin = data1.roles === 'Administrator'
         const response2 = await fetch('api/Request/' + id);
         const data2 = await response2.json();
-        const response3 = await fetch('api/Request/Active');
-        const data3 = await response3.json();
-        const response4 = await fetch('api/User/' + data2.createdById)
+        const response3 = await fetch('api/User/' + data2.createdById)
+        const data3 = await response3.json()
+        const response4 = await fetch('api/Request');
         const data4 = await response4.json();
+        const curDate = Moment(new Date()).format('LL')
         
         if (data2 !== null) {
             this.setState({
@@ -331,8 +353,8 @@ export class ReviewRequest extends Component {
                 admin: isAdmin,
                 userId: userId,
                 date: data2.approvedDate,
-                active: data3.filter(r => (r.createdBy.supervisorId === userId) && (Moment(r.endDate).format('LL') < curDate && !r.archived)),
-                requester: data4
+                requestor: data3,
+                active: data4.filter(r => (r.createdBy.supervisorId === userId) && (Moment(r.endDate).format('LL') <= curDate && !r.archived)),
             })
         }
     }
