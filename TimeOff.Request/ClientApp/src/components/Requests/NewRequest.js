@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
 import { 
-    Button, Form, FormGroup, Label, Input, Col
+    Button, Form, FormGroup, Label, Input, Col, Row, FormText
 }  from 'reactstrap';
 import Moment from 'moment';
 
 const submitRequest = async values => {
-    console.log("Submit Request")
-    console.log(values);
     const url = '/api/Request';
     const resp = await fetch(url, {
         method: 'POST',
@@ -14,33 +12,21 @@ const submitRequest = async values => {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            createdById: values.user.id,
-            description: values.description,
-            createdDate: new Date(),
-            approvedDate: new Date(),
-            startDate: values.startDate,
-            endDate: values.endDate,
-            numberOfDays: values.numberOfDays,
-            canceled: false,
-            disabled: false,
-            archived: false
+            ...values
         })
     });
     return resp.json();
 }
 
 const updateUser = async values => {
-    console.log("Update User")
-    console.log(values);
-    const url = '/api/User/' + values.user.id;
+    const url = '/api/User/' + values.id;
     const resp = await fetch(url, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            ...values.user,
-            numberOfDaysOff: values.available
+            ...values
         })
     });
     return resp.json();
@@ -57,7 +43,8 @@ export class NewRequest extends Component {
             user: [],
             error: '',
             loading: true,
-            available: 0
+            available: 0,
+            lastReq: 0
         }
 
         this.handleSubmit = this.handleSubmit.bind(this)
@@ -65,7 +52,6 @@ export class NewRequest extends Component {
 
     componentDidMount() {
         this.populateRequestDate();
-        console.log("Component did mount");
     }
 
     handleChange = (e) => {
@@ -80,13 +66,49 @@ export class NewRequest extends Component {
     async handleSubmit(event) {
         if (this.state.startDate !== null || this.state.endDate !== null 
             || this.state.description !== null) {
-            console.log(this.state)
             event.preventDefault();
-            await submitRequest(this.state);
-            await updateUser(this.state);
+            const req = this.createNewRequest()
+            const user = this.updateUserDays()
+            
+            await updateUser(user)
+            await submitRequest(req).then((response) => {
+                if (response.id > this.state.lastReq) {
+                    this.props.onNewRequest()
+                } else {
+                    return this.setState({ error: 'Unable to submit request.' })
+                }
+            })
         } else {
             return this.setState({ error: 'Not all required fields entered.' });
         }
+    }
+
+    createNewRequest() {
+        const req = {
+            id: 0,
+            createdById: this.state.user.id,
+            approvedById: null,
+            description: this.state.description,
+            createdDate: Moment(new Date()).format(Moment.HTML5_FMT.DATETIME_LOCAL_MS),
+            approvedDate: Moment(new Date()).format(Moment.HTML5_FMT.DATETIME_LOCAL_MS),
+            startDate: Moment(this.state.startDate).format(Moment.HTML5_FMT.DATETIME_LOCAL_MS),
+            endDate: Moment(this.state.endDate).format(Moment.HTML5_FMT.DATETIME_LOCAL_MS),
+            numberOfDays: this.state.numberOfDays,
+            canceled: false,
+            disabled: false,
+            archived: false
+        }
+
+        return req
+    }
+
+    updateUserDays() {
+        const user = {
+            ...this.state.user,
+            numberOfDaysOff: this.state.available
+        }
+
+        return user
     }
 
     dateCalc = () => {
@@ -112,80 +134,90 @@ export class NewRequest extends Component {
         }
     }
 
-    renderAvailableDays(days) {
-        return (
-            `${days}`
-        )
-    }
-
     render() {
         return (
-            <Form className='mt-2'>
+            <Form className='ml-1 mt-3'  onSubmit={this.handleSubmit}>
                 {
                     this.state.error &&
-                    <div
-                        className='LoginError'
-                        color='danger'
-                    >{this.state.error}</div>
+                    <h6
+                        className='mt-2'
+                        style={{color: 'red'}}
+                    >{this.state.error}</h6>
                 }
-                <FormGroup row>
-                    <Label for='startDate' sm={6}>Start Date:</Label>
-                    <Col sm={10}>
-                        <Input 
-                            type='date'
-                            name='startDate'
-                            id='startDate'
-                            onChange={ this.handleChange }
-                        />
-                    </Col>
+                <FormGroup>
+                    <Row>
+                        <h4 className="ml-3 mb-3">Submit a New Request</h4>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <Label for='startDate'>Start Date:</Label>
+                            <Input 
+                                style={{textAlign: 'center'}}
+                                type='date'
+                                name='startDate'
+                                id='startDate'
+                                onChange={ this.handleChange }
+                            />
+                        </Col>
+                        <Col>
+                            <Label for='endDate'>End Date:</Label>
+                            <Input 
+                                style={{textAlign: 'center'}}
+                                type='date'
+                                name='endDate'
+                                id='endDate'
+                                onChange={ this.handleChange }
+                            />
+                        </Col>
+                    </Row>
                 </FormGroup>
-                <FormGroup row>
-                    <Label for='endDate' sm={6}>End Date:</Label>
-                    <Col sm={10}>
-                        <Input 
-                            type='date'
-                            name='endDate'
-                            id='endDate'
-                            onChange={ this.handleChange }
-                        />
-                    </Col>
+                <FormGroup>
+                    <Row>
+                        <Col>
+                            <Label for='availableDays' style={{width: 160}}>
+                                Available Days: {this.state.user.numberOfDaysOff}
+                            </Label>
+                        </Col>
+                        <Col>
+                            <Label for='numberOfDays' style={{width: 160}}>
+                                Number of Days: {this.state.numberOfDays}
+                            </Label>
+                        </Col>
+                    </Row>
                 </FormGroup>
-                <FormGroup row>
-                    <Label for='numberOfDays' sm={12}>
-                        Number of Days: {this.state.loading ? <em>Loading...</em> 
-                        : this.renderAvailableDays(this.state.numberOfDays)}
-                    </Label>
-                </FormGroup>
-                <FormGroup row>
-                    <Label for='description' sm={12}>
+                <FormGroup>
+                    <Label for='description'>
                         Description:
                     </Label>
-                    <Col sm={12}>
-                        <Input 
-                            type='textarea'
-                            name='description'
-                            id='description'
-                            onChange={ this.handleChange }
-                        />
-                    </Col>
+                    <Input
+                        type='textarea'
+                        name='description'
+                        id='description'
+                        onChange={this.handleChange}
+                    />
                 </FormGroup>
-                <FormGroup check row>
-                    <Col sm={10}>
-                        <Button onClick={this.handleSubmit}>Submit</Button>
-                    </Col>
+                <FormGroup>
+                    <Button
+                        id='submit'
+                        type='submit'
+                    >Submit</Button>
                 </FormGroup>
             </Form>
         )
     }
 
     async populateRequestDate() {
-        const response = await fetch('api/User/' + 1);
-        const data = await response.json();
-        if (data !== null) {
+        const userId = 2 // JSON.parse(localStorage.getItem('user')).id
+        const response1 = await fetch('api/User/' + userId);
+        const data1 = await response1.json();
+        const response2 = await fetch('api/Request/')
+        const data2 = await response2.json()
+        if (data1 !== null && data2 !== null) {
             this.setState({
-                user: data,
-                loading: false
-            }, () => {console.log(this.state.user)})
+                user: data1,
+                loading: false,
+                lastReq: data2.length
+            })
         }
     }
 }

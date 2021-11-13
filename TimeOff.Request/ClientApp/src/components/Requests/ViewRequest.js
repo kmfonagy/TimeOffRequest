@@ -1,12 +1,11 @@
 ﻿import React, { Component } from 'react';
 import {
-    Input, Button, Row, Form, FormGroup, Label, Table, FormText
+    Input, Button, Row, Form, FormGroup, Label, Table, Spinner, Col, FormText
 } from 'reactstrap';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import Moment from 'moment';
 
 const updateRequest = async values => {
-    console.log(values.id);
     const url = '/api/Request/' + values.id;
     const resp = await fetch(url, {
         method: 'PUT',
@@ -14,81 +13,54 @@ const updateRequest = async values => {
             'Content-type': 'application/json'
         },
         body: JSON.stringify({
-            id: values.id,
-            createdById: values.createdById,
-            description: values.description,
-            createdDate: values.createdDate,
-            approvedDate: values.approvedDate,
-            startDate: values.startDate,
-            endDate: values.endDate,
-            numberOfDays: values.numberOfDays,
-            canceled: false,
-            archived: false,
-            disabled: false
+            ...values
         })
     })
     return resp.json();
 }
 
-const udpateUser = async values => {
-    const url = '/api/User/' + values.user.id;
+const updateUser = async values => {
+    const url = '/api/User/' + values.id;
     const resp = await fetch(url, {
         method: 'PUT',
         headers: {
             'Content-type': 'application/json'
         },
         body: JSON.stringify({
-            ...values.user
+            ...values
         })
-    });
-    return resp.json();
+    })
+    return resp.json()
 }
 
 export class ViewRequest extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            id: null,
-            createdById: null,
-            approvedById: null,
-            description: null,
-            createdDate: null,
-            approvedDate: null,
-            startDate: null,
-            endDate: null,
-            numberOfDays: null,
-            canceled: false,
-            archived: false,
-            disabled: false,
+            request: null,
+            description: '',
+            startDate: '',
+            endDate: '',
+            numberOfDays: 0,
             loading: true,
+            checked: false,
             status: null,
-            days: null,
+            hide: false,
             user: null,
-            error: null
+            redirect: false,
+            error: false,
+            avail: null
         }
 
         this.onDescriptionChange = this.onInputChange.bind(this, 'description');
         this.onCancel = this.onInputChange.bind(this, 'checked');
         this.onStartChange = this.onInputChange.bind(this, 'startDate');
-        this.onEndChange = this.onInputChange.bind(this, 'endDate');
-        this.submitRequest = this.submitRequest.bind(this);
-        this.availableDays = this.availableDays.bind(this)
+        this.onEndChange = this.onInputChange.bind(this, 'endDate')
+        this.submitRequest = this.submitRequest.bind(this)
     }
 
     componentDidMount() {
-        this.populateRequestData().then(this.updateStatus(this.state));
-    }
-
-    updateStatus(req) {
-        let status = null;
-        if (req.approvedById !== null) {
-            status = 'Approved'
-        } else if (req.canceled === true) {
-            status = 'Denied'
-        } else {
-            status = 'Awaiting Approval'
-        }
-        this.setState({ status })
+        this.populateRequestData().then(() => this.updateStatus());
     }
 
     onInputChange(keyName, event) {
@@ -99,56 +71,76 @@ export class ViewRequest extends Component {
         })
     }
 
-    dateCalc() {
-        let end = Moment(this.state.endDate).format('YYYY-MM-DD');
-        let start = Moment(this.state.startDate).format('YYYY-MM-DD');
-        let time = Moment(end).diff(start);
-        let days = time / (1000 * 60 * 60 * 24);
-        if (this.availableDays(days)) {
-            this.setState({
-                numberOfDays: days,
-                approvedById: null
-            })
+    updateStatus() {
+        let status = ''
+        let hide = false
+        if (this.state.request.approvedById !== null) {
+            status = 'Approved'
+        } else if (this.state.request.canceled) {
+            status = 'Denied'
+        } else {
+            status = 'Awaiting Approved'
         }
+
+        if (this.state.request.canceled || this.state.request.disabled) {
+            hide = true
+        }
+
+        this.setState({
+            hide: hide,
+            status: status
+        })
     }
 
-    availableDays(days) {
-        let pass = false
-        let avail = this.state.user.numberOfDaysOff
-        console.log(avail)
-        if (avail >= days) {
-            if (days > this.state.days) {
-                let diff = days - this.state.days
+    dateCalc() {
+        if (this.state.startDate !== '' && this.state.endDate !== '') {
+            let end = Moment(this.state.endDate).format('YYYY-MM-DD');
+            let start = Moment(this.state.startDate).format('YYYY-MM-DD');
+            let time = Moment(end).diff(start);
+            let days = time / (1000 * 60 * 60 * 24);
+            if (days > this.state.user.numberOfDaysOff) {
                 this.setState({
-                    user: {
-                        numberOfDaysOff: avail - diff
-                    }
+                    error: true
                 })
-                pass = true
-            } else if (this.state.days > days) {
-                let diff = this.state.days - days
-                this.setState({
-                    user: {
-                        numberOfDaysOff: avail + diff
-                    }
-                })
-                pass = true
             } else {
-                pass = true
+                this.setState({
+                    numberOfDays: days
+                })
             }
-        } else {
-            this.setState({
-                error: 'Insufficient Avaialbe Days Off'
-            })
-        }
 
-        return pass;
+            if (this.state.request.numberOfDays !== days) {
+                let newDays = this.state.request.numberOfDays - days
+                let avail = this.state.user.numberOfDaysOff + newDays
+                this.setState({avail})
+            }
+        }
     }
 
     async submitRequest(event) {
         event.preventDefault();
-        const values = this.state
-        await updateRequest(values)
+        let startDate = Moment(this.state.startDate).format(Moment.HTML5_FMT.DATETIME_LOCAL_MS)
+        let endDate = Moment(this.state.endDate).format(Moment.HTML5_FMT.DATETIME_LOCAL_MS)
+        const values = {
+            ...this.state.request,
+            description: this.state.description,
+            startDate: startDate,
+            endDate: endDate,
+            numberOfDays: this.state.numberOfDays,
+            approvedBy: null,
+            approvedById: null
+        }
+
+        if (this.state.request.numberOfDays !== this.state.numberOfDays) {
+            const user ={
+                ...this.state.user,
+                numberOfDaysOff: this.state.avail
+            }
+            await updateUser(user)
+        }
+
+        await updateRequest(values).then(() => {
+            this.setState({redirect: true})
+        });
     }
 
     renderViewRequest(state) {
@@ -157,7 +149,7 @@ export class ViewRequest extends Component {
                 <Table dark>
                     <thead>
                         <tr>
-                            <th>Request</th>
+                            <th>Request Number</th>
                             <th>Created Date</th>
                             <th>Approved Date</th>
                         </tr>
@@ -165,95 +157,97 @@ export class ViewRequest extends Component {
                     </thead>
                     <tbody>
                         <tr>
-                            <td style={{textAlign: 'center'}}>{state.id}</td>
-                            <td>{Moment(state.createdDate).format('LL')}</td>
-                            <td>
-                                {state.status}
-                            </td>
+                            <td style={{textAlign: 'center'}}>{state.request.id}</td>
+                            <td>{Moment(state.request.createdDate).format('LL')}</td>
+                            <td>{state.status}</td>
                         </tr>
                     </tbody>
-                </Table>
-                <Table dark>
                     <thead>
                         <tr>
-                            <td>Start Date</td>
-                            <td>End Date</td>
-                            <td>Number of Days</td>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Number of Days</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>{Moment(state.startDate).format('LL')}</td>
-                            <td>{Moment(state.endDate).format('LL')}</td>
-                            <td style={{textAlign: 'center'}}>{state.numberOfDays}</td>
+                            <td>{Moment(state.request.startDate).format('LL')}</td>
+                            <td>{Moment(state.request.endDate).format('LL')}</td>
+                            <td style={{textAlign: 'center'}}>{state.request.numberOfDays}</td>
                         </tr>
                     </tbody>
-                </Table>
-                <Table dark>
                     <thead>
                         <tr>
-                            <td>Description</td>
-                            <td>Remaining Days</td>
+                            <th colSpan='2'>Description</th>
+                            <th>Available Days</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>{state.description}</td>
-                            <td>{state.user.numberOfDaysOff}</td>
+                            <td colSpan='2'>{state.request.description}</td>
+                            <td style={{textAlign: 'center'}}>{state.user.numberOfDaysOff}</td>
                         </tr>
                     </tbody>
                 </Table>
                 <div>
-                    <Form style={{ width: 'auto' }} className='mt-2' onSubmit={this.submitRequest} >
-                        {
-                            this.state.error &&
-                            <FormText invalid>{this.state.error}</FormText>
-                        }
-                        <FormGroup>
-                            <Label for='start'>New Start Date: </Label>
-                            <Input
-                                key='start'
-                                id='start'
-                                name='start'
-                                style={{ width: '150px', textAlign: 'center' }}
-                                type='date'
-                                value={state.startDate}
-                                onChange={this.onStartChange}
-                                disabled={state.canceled}
-                            />
-                            <Label for='end' className='mt-2'>New End Date: </Label>
-                            <Input
-                                key='end'
-                                id='end'
-                                name='end'
-                                style={{ width: '150px', textAlign: 'center' }}
-                                type='date'
-                                value={state.endDate}
-                                onChange={this.onEndChange}
-                                disabled={state.canceled}
-                            />
-                        </FormGroup>
-                        <FormGroup>
-                            <Label for='description'>Description: </Label>
-                            <Input
-                                type='textarea'
-                                key='description'
-                                id='description'
-                                name='description'
-                                value={state.description}
-                                onChange={this.onDescriptionChange}
-                                disabled={state.canceled}
-                            />
-                        </FormGroup>
-                        <FormGroup>
-                            {!state.canceled &&
+                    {state.hide ? (<p>&nbsp;</p>) : (
+                        <Form style={{width: 'auto'}} className='mt-2' onSubmit={this.submitRequest}>
+                            <FormGroup>
+                                { this.state.error && <FormText className='mb-2'><h6 style={{color: 'red'}}>Unable to complete request</h6></FormText> }
+                                <Row>
+                                    <Col>
+                                        <Label for='start'>New Start Date: </Label>
+                                        <Input
+                                            key='start'
+                                            id='start'
+                                            name='start'
+                                            style={{ width: '150px', textAlign: 'center' }}
+                                            type='date'
+                                            value={state.startDate}
+                                            onChange={this.onStartChange}
+                                        />
+                                    </Col>
+                                    <Col>
+                                        <Label for='end'>New End Date: </Label>
+                                        <Input
+                                            key='end'
+                                            id='end'
+                                            name='end'
+                                            style={{ width: '150px', textAlign: 'center' }}
+                                            type='date'
+                                            value={state.endDate}
+                                            onChange={this.onEndChange}
+                                        />
+                                    </Col>
+                                    <Col>
+                                        <Label>Days:</Label><br/>
+                                        <Input 
+                                            disabled
+                                            style={{ width: 50, textAlign: 'center', backgroundColor: 'white' }}
+                                            placeholder={state.numberOfDays}
+                                        />
+                                    </Col>
+                                </Row>
+                            </FormGroup>
+                            <FormGroup>
+                                <Label for='description'>Description: </Label>
+                                <Input
+                                    type='textarea'
+                                    key='description'
+                                    id='description'
+                                    name='description'
+                                    value={state.description}
+                                    onChange={this.onDescriptionChange}
+                                />
+                            </FormGroup>
+                            <FormGroup>
                                 <Button
                                     id='submit'
                                     type='submit'
                                 >Submit</Button>
-                            }
-                        </FormGroup>
-                    </Form>
+                            </FormGroup>
+                        </Form>
+                    )}
                 </div>
             </div>
         )
@@ -262,12 +256,13 @@ export class ViewRequest extends Component {
     render() {
         return (
             <div>
+                { this.state.redirect && <Redirect push to={`/history`} /> }
                 <Row key='0' className='mb-2'>
                     <Link to={`/history`}>&laquo; Return to Request History</Link>
                 </Row>
-                <Row key='1'>
+                <Row key='2'>
                     {this.state.loading ?
-                        <p><em>Loading Request...</em></p> : this.renderViewRequest(this.state)}
+                        <Spinner>Loading...</Spinner> : this.renderViewRequest(this.state)}
                 </Row>
             </div>
         )
@@ -275,28 +270,18 @@ export class ViewRequest extends Component {
 
     async populateRequestData() {
         const id = this.props.match.params.id;
-        const resp = await fetch ('api/User/' + id);
-        const user = await resp.json();
-        console.log(user)
-        const response = await fetch('api/Request/' + id);
-        const data = await response.json();
-        if (data !== null) {
+        const user = 2 //localStorage.getItem('user');
+        const response1 = await fetch('api/Request/' + id);
+        const data1 = await response1.json();
+        const response2 = await fetch('api/User/' + user);
+        const data2 = await response2.json();
+
+        if (data1 !== null && data2 !== null) {
             this.setState({
-                id: data.id,
-                createdById: data.createdById,
-                approvedById: data.approvedById,
-                description: data.description,
-                createdDate: data.createdDate,
-                approvedDate: data.approvedDate,
-                startDate: data.startDate,
-                endDate: data.endDate,
-                numberOfDays: data.numberOfDays,
-                days: data.numberOfDays,
-                canceled: data.canceled,
-                archived: false,
-                disabled: false,
+                request: data1,
+                user: data2,
                 loading: false,
-                user: user 
+                description: data1.description
             })
         }
     }
