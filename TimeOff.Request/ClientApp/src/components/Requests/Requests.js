@@ -33,6 +33,13 @@ export class Requests extends Component {
         })
     }
 
+    newRequestSubmit = () => {
+        this.setState({
+            displaying: 'history',
+            title: 'Request History'
+        })
+    }
+
     render() {
         return (
             <div>
@@ -56,7 +63,7 @@ export class Requests extends Component {
                     {this.state.displaying === 'history' ? (
                         <History />
                     ) : (
-                        <NewRequest />
+                        <NewRequest onNewRequest={this.newRequestSubmit} />
                     )}
                 </Row>
             </div>
