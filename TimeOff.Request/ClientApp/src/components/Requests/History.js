@@ -1,7 +1,7 @@
 ﻿import React, { Component } from 'react';
 import {
     Row, Button, Dropdown, DropdownToggle, DropdownMenu,
-    DropdownItem, InputGroup, InputGroupAddon, Input
+    DropdownItem, InputGroup, InputGroupAddon, Input, Spinner
 } from 'reactstrap';
 import RequestTable from './RequestTable';
 
@@ -130,9 +130,15 @@ export class History extends Component {
     }
 
     renderReqsTable(state) {
-        return (
-            <RequestTable state={state} />
-        )
+        if (state.requests.filter(r => !r.archived ) !== 0) {
+            return (
+                <RequestTable state={state} />
+            )
+        } else {
+            return (
+                <h6 className="m-3"><em>No available requests</em></h6>
+            )
+        }
     }
 
     render() {
@@ -145,9 +151,9 @@ export class History extends Component {
             <div>
                 <Row key='1'>
                     <h4 className="m-3">{this.state.lastClicked}</h4>
-                    <InputGroup>
-                        <Button color="secondary" onClick={this.setAll} className="m-2" style={{height: '40px'}}>All</Button>
-                        <Dropdown group isOpen={this.state.open} size="sm" toggle={this.toggle} className="m-2" style={{height: '40px'}}>
+                    <InputGroup  className="m-2">
+                        <Button color="secondary" onClick={this.setAll} className="ml-2" style={{height: '40px'}}>All</Button>
+                        <Dropdown group isOpen={this.state.open} size="sm" toggle={this.toggle} className="ml-2 mr-2" style={{height: '40px'}}>
                             <DropdownToggle caret>
                                 Approval Status
                             </DropdownToggle>
@@ -162,18 +168,17 @@ export class History extends Component {
                             </DropdownMenu>
                         </Dropdown>
                         <InputGroupAddon 
-                        size='sm' addonType="prepend" className="mb-2 mt-2 ml-2" style={{height: '40px'}}>After</InputGroupAddon>
+                        size='sm' addonType="prepend" className="ml-2" style={{height: '40px'}}>After</InputGroupAddon>
                         <Input
                             key="after"
                             id="afterDate"
                             name="afterDate"
                             value={this.state.afterDate === null ? '' : this.state.afterDate}
                             type="date"
-                            className="mb-2 mt-2"
                             onChange={this.afterDateChange}
                             style={{ maxWidth: '180px', textAlign: 'center', height: '40px' }}
                         />
-                        <InputGroupAddon addonType="prepend" className="mb-2 mt-2 ml-2" 
+                        <InputGroupAddon addonType="prepend" className="ml-2" 
                         size='sm' style={{height: '40px'}}>Before</InputGroupAddon>
                         <Input
                             key="before"
@@ -183,14 +188,13 @@ export class History extends Component {
                             type="date"
                             onChange={this.beforeDateChange}
                             style={{ maxWidth: '180px', textAlign: 'center', height: '40px' }}
-                            className="mb-2 mt-2"
                         />
-                        <Button onClick={this.filterByDate} className="m-2" size='sm' style={{height: '40px'}}>Filter</Button>
+                        <Button onClick={this.filterByDate} className="ml-2 mr-2" size='sm' style={{height: '40px'}}>Filter</Button>
                     </InputGroup>
                 </Row>
                 <Row key="3">
                     {this.state.loading
-                        ? <p><em>Loading...</em></p>
+                        ? <Spinner className="m-3">Loading...</Spinner>
                         : this.renderReqsTable(this.state)}
                 </Row>
             </div>
