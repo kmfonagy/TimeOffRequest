@@ -334,7 +334,7 @@ export class ReviewRequest extends Component {
 
     async populateRequestData() {
         const id = this.props.match.params.id;
-        const userId = 1  // localStorage.getItem('user');
+        const userId = JSON.parse(localStorage.getItem("user")).id;
         const response1 = await fetch('api/User/' + userId)
         const data1 = await response1.json();
         const isAdmin = data1.roles === 'Administrator'
