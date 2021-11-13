@@ -16,7 +16,6 @@ export class RequestTable extends Component {
 
     approvalStatus(req) {
         let status = null
-        console.log(req.approvedById)
         if (req.approvedById !== null) {
             status = 'Approved'
         } else if (req.canceled === true) {
@@ -30,7 +29,7 @@ export class RequestTable extends Component {
     render() {
         return (
             <div>
-                <Table dark hover>
+                <Table dark hover className="m-3">
                     <thead>
                         <tr>
                             <th>Request</th>
