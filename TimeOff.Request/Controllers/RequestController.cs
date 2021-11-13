@@ -138,11 +138,19 @@ namespace TimeOff.Request.Controllers
 
                 var u = _reqRepo.Get(r.Id).CreatedBy;
 
-                _notificationRepo.Create(new NotificationEntity {
+                var n = _notificationRepo.Create(new NotificationEntity
+                {
                     RequestId = r.Id,
-                    NotifyUserId = (int)u.SupervisorId,
                     Description = u.Name + " has requested time off."
                 });
+                if (u.SupervisorId == null)
+                {
+                    n.NotifyUserId = u.Id;
+                }
+                else
+                {
+                    n.NotifyUserId = (int)u.SupervisorId;
+                }
 
                 _unitOfWork.SaveChanges();
 
@@ -180,34 +188,34 @@ namespace TimeOff.Request.Controllers
 
                 if (r.Canceled == true)
                 {
-                    desc = u.Name + " has canceled request " + r.Id + ".";
+                    desc = "Request number " + r.Id + " was denied.";
                     _notificationRepo.Create(new NotificationEntity
                     {
                         RequestId = r.Id,
-                        NotifyUserId = (int)u.SupervisorId,
+                        NotifyUserId = u.Id,
                         Description = desc
                     });
                 }
                 else if (originalStart != r.StartDate || originalEnd != r.EndDate)
                 {
                     desc = u.Name + " has updated request " + r.Id + ".";
-                    _notificationRepo.Create(new NotificationEntity
+                    var n = _notificationRepo.Create(new NotificationEntity
                     {
                         RequestId = r.Id,
-                        NotifyUserId = (int)u.SupervisorId,
                         Description = desc
                     });
-                }
-                else
-                {
-                    if (r.ApprovedById == null)
+                    if (u.SupervisorId == null)
                     {
-                        desc = "Request number " + r.Id + " was denied.";
+                        n.NotifyUserId = u.Id;
                     }
                     else
                     {
-                        desc = "Request number " + r.Id + " has been approved.";
+                        n.NotifyUserId = (int)u.SupervisorId;
                     }
+                }
+                else if (r.ApprovedById != null)
+                {
+                    desc = "Request number " + r.Id + " has been approved.";
 
                     _notificationRepo.Create(new NotificationEntity
                     {
