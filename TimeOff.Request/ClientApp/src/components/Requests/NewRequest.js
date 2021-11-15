@@ -194,12 +194,11 @@ export class NewRequest extends Component {
         const data = await response.json();
         const userRequests = await fetch('api/Request/CreatedBy/' + 1)
         const requests = await userRequests.json()
-        console.log("Last user request id: " + requests.pop().id)
         if (data !== null) {
             this.setState({
                 user: data,
                 loading: false,
-                lastReq: requests.pop().id
+                lastReq: requests[requests.length - 1].id
             })
         }
     }

@@ -12,15 +12,6 @@ export class Login extends Component {
     this.handleSubmit = this.handleSubmit.bind(this)
   }
 
-<<<<<<< HEAD
-  handleSubmit = () => {
-    let user = {
-      id: 2,
-      email: this.state.email
-    }
-
-    localStorage.setItem('user', JSON.stringify(user))
-=======
   async handleSubmit() {
     this.setState({ error: false })
 
@@ -35,7 +26,6 @@ export class Login extends Component {
     } else {
       this.setState({ error: true })
     }
->>>>>>> Release_2021_11_19
   }
 
   validateForm() {
