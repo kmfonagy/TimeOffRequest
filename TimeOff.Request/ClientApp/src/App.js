@@ -1,10 +1,11 @@
-﻿import React, { Component } from 'react';
+import React, { Component } from 'react';
 import { Route } from 'react-router';
 import { Layout } from './components/Layout';
 import { Home } from './components/Home';
 import { FetchData } from './components/FetchData';
 import { Counter } from './components/Counter';
 import { Users } from './components/Users/Users';
+import { AddUser } from './components/Users/AddUser';
 import { Requests } from './components/Requests/Requests';
 import { ViewRequest } from './components/Requests/ViewRequest';
 import { ReviewRequests } from './components/Requests/ReviewRequests';
@@ -16,7 +17,7 @@ import './custom.css'
 
 export default class App extends Component {
     static displayName = App.name;
-
+    
     render() {
         return (
             <Layout>
@@ -28,8 +29,12 @@ export default class App extends Component {
                 <Route path='/history' component={Requests} />
                 <Route path='/request/:id' component={ViewRequest} />
                 <Route path='/notifications' component={Notifications} />
+<<<<<<< HEAD
                 <Route path='/review-requests' component={ReviewRequests} />
                 <Route path='/review/:id' component={ReviewRequest} />
+=======
+                <Route path='/adduser' component={AddUser} />
+>>>>>>> Release_2021_11_19
             </Layout>
         );
     }
