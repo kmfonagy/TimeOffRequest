@@ -202,12 +202,7 @@ export class History extends Component {
     }
 
     async populateRequestData() {
-<<<<<<< HEAD
-        const user = JSON.parse(localStorage.getItem('user')).id;
-        const response = await fetch('api/request/CreatedBy/' + user);
-=======
         const response = await fetch('api/request/CreatedBy/' + JSON.parse(localStorage.getItem('user')).id);
->>>>>>> Release_2021_11_19
         const data = await response.json();
         
         if (data.length > 0) {
