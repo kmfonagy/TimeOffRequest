@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-import { Table, Button, Row, Input } from 'reactstrap';
+import { Table, Row, Input } from 'reactstrap';
 import Moment from 'moment';
 import Col from 'reactstrap/lib/Col';
 import { Link } from 'react-router-dom';
-import { Redirect } from 'react-router';
 
 export class Users extends Component {
   static displayName = Users.name;
@@ -32,7 +31,6 @@ export class Users extends Component {
       <Table dark hover>
         <thead>
           <tr>
-            <th>Id</th>
             <th>Name</th>
             <th>Email</th>
             <th>Created</th>
@@ -45,7 +43,6 @@ export class Users extends Component {
         <tbody>
           {users.map(user =>
             <tr key={ user.id }>
-              <td>{ user.id }</td>
               <td>{ user.name }</td>
               <td>{ user.email }</td>
               <td>{ Moment(user.userCreated).format('LL') }</td>
