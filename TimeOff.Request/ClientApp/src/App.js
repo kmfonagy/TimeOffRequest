@@ -29,12 +29,9 @@ export default class App extends Component {
                 <Route path='/history' component={Requests} />
                 <Route path='/request/:id' component={ViewRequest} />
                 <Route path='/notifications' component={Notifications} />
-<<<<<<< HEAD
                 <Route path='/review-requests' component={ReviewRequests} />
                 <Route path='/review/:id' component={ReviewRequest} />
-=======
                 <Route path='/adduser' component={AddUser} />
->>>>>>> Release_2021_11_19
             </Layout>
         );
     }
