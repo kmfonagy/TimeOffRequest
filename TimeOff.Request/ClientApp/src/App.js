@@ -8,8 +8,10 @@ import { Users } from './components/Users/Users';
 import { AddUser } from './components/Users/AddUser';
 import { Requests } from './components/Requests/Requests';
 import { ViewRequest } from './components/Requests/ViewRequest';
+import { ReviewRequests } from './components/Requests/ReviewRequests';
 import { Login } from './components/Login/Login'
 import { Notifications } from './components/Notifications';
+import { ReviewRequest } from './components/Requests/ReviewRequest';
 
 import './custom.css'
 
@@ -27,6 +29,8 @@ export default class App extends Component {
                 <Route path='/history' component={Requests} />
                 <Route path='/request/:id' component={ViewRequest} />
                 <Route path='/notifications' component={Notifications} />
+                <Route path='/review-requests' component={ReviewRequests} />
+                <Route path='/review/:id' component={ReviewRequest} />
                 <Route path='/adduser' component={AddUser} />
             </Layout>
         );
