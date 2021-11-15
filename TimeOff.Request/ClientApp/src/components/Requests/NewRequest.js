@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
 import { 
-    Button, Form, FormGroup, Label, Input, Col
+    Button, Form, FormGroup, Label, Input, Col, FormText
 }  from 'reactstrap';
 import Moment from 'moment';
 
 const submitRequest = async values => {
-    console.log("Submit Request")
-    console.log(values);
     const url = '/api/Request';
     const resp = await fetch(url, {
         method: 'POST',
@@ -30,8 +28,6 @@ const submitRequest = async values => {
 }
 
 const updateUser = async values => {
-    console.log("Update User")
-    console.log(values);
     const url = '/api/User/' + values.user.id;
     const resp = await fetch(url, {
         method: 'PUT',
@@ -57,7 +53,9 @@ export class NewRequest extends Component {
             user: [],
             error: '',
             loading: true,
-            available: 0
+            available: 0,
+            redirect: false,
+            lastReq: 0
         }
 
         this.handleSubmit = this.handleSubmit.bind(this)
@@ -65,7 +63,6 @@ export class NewRequest extends Component {
 
     componentDidMount() {
         this.populateRequestDate();
-        console.log("Component did mount");
     }
 
     handleChange = (e) => {
@@ -80,13 +77,25 @@ export class NewRequest extends Component {
     async handleSubmit(event) {
         if (this.state.startDate !== null || this.state.endDate !== null 
             || this.state.description !== null) {
-            console.log(this.state)
             event.preventDefault();
-            await submitRequest(this.state);
             await updateUser(this.state);
+            await submitRequest(this.state).then(response => {
+                if (response.id > this.state.lastReq) {
+                    this.CheckPass()
+                } else {
+                    return this.setState({ error: 'Unable to submit request.' })
+                }
+            })
+            
+
         } else {
             return this.setState({ error: 'Not all required fields entered.' });
         }
+    }
+
+    CheckPass() {
+        console.log('CheckPass true')
+        this.props.onNewRequest()
     }
 
     dateCalc = () => {
@@ -119,14 +128,16 @@ export class NewRequest extends Component {
     }
 
     render() {
+        // if (this.state.redirect) {
+        //     return <Redirect to="/history" />
+        // }
         return (
             <Form className='mt-2'>
                 {
                     this.state.error &&
-                    <div
-                        className='LoginError'
-                        color='danger'
-                    >{this.state.error}</div>
+                    <FormText
+                        invalid
+                    >{this.state.error}</FormText>
                 }
                 <FormGroup row>
                     <Label for='startDate' sm={6}>Start Date:</Label>
@@ -179,13 +190,17 @@ export class NewRequest extends Component {
     }
 
     async populateRequestDate() {
-        const response = await fetch('api/User/' + 1);
+        const response = await fetch('api/User/' + JSON.parse(localStorage.getItem('user')).id);
         const data = await response.json();
+        const userRequests = await fetch('api/Request/CreatedBy/' + 1)
+        const requests = await userRequests.json()
+        console.log("Last user request id: " + requests.pop().id)
         if (data !== null) {
             this.setState({
                 user: data,
-                loading: false
-            }, () => {console.log(this.state.user)})
+                loading: false,
+                lastReq: requests.pop().id
+            })
         }
     }
 }

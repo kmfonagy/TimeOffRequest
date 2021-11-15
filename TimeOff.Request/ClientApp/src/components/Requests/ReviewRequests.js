@@ -1,4 +1,4 @@
-﻿import React, { Component } from 'react';
+import React, { Component } from 'react';
 import { Row, Spinner } from 'reactstrap';
 import { ReviewTable } from './ReviewTable';
 import Moment from 'moment'
@@ -44,7 +44,11 @@ export class ReviewRequests extends Component {
         const curDate = Moment(new Date()).format('LL')
         const response = await fetch('api/Request/Active');
         const data = await response.json();
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> Release_2021_11_19
         if (data !== null) {
             this.setState({
                 requests: data.filter(r => (r.createdBy.supervisorId === 1) && (Moment(r.endDate).format('LL') <= curDate)),

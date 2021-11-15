@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using TimeOff.Request.DataAccess;
+using TimeOff.Request.Domain.Shared.Entities;
 using TimeOff.Request.Domain.Shared.Models;
 using TimeOff.Request.Domain.Shared.Services;
 
@@ -14,7 +15,7 @@ namespace TimeOff.Request.Domain.Services
             this._db = db;
         }
 
-        public User Authenticate(UserLogin login) {
+        public UserEntity Authenticate(UserLogin login) {
 
             var user = _db.Users.FirstOrDefault(u => u.Email == login.Email);
 
@@ -30,13 +31,13 @@ namespace TimeOff.Request.Domain.Services
                 user.LastLogin = DateTime.Now;
                 _db.SaveChanges();
 
-                return authenticatedUser;
+                return user;
             }
 
             return null;
         }
 
-        public User Register(UserRegister userRegister) {
+        public UserEntity Register(UserRegister userRegister) {
             var user = _db.Users.Where(u => u.Email == userRegister.Email).FirstOrDefault();
 
             if (user == null) {

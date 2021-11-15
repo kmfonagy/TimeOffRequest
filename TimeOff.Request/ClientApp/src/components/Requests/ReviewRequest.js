@@ -50,8 +50,12 @@ export class ReviewRequest extends Component {
             show: false,
             redirect: false,
             error: false,
+<<<<<<< HEAD
             requestor: null,
             sorted: []
+=======
+            requestor: null
+>>>>>>> Release_2021_11_19
         }
 
         this.onApprove = this.onApprove.bind(this)
@@ -62,8 +66,7 @@ export class ReviewRequest extends Component {
     }
 
     componentDidMount() {
-        this.populateRequestData()
-            .then(() => this.updateStatus())
+        this.populateRequestData().then(() => this.updateStatus())
     }
 
     updateStatus() {
@@ -71,11 +74,15 @@ export class ReviewRequest extends Component {
         let show = false
         let approved = this.state.request.approvedById
         let canceled = this.state.request.canceled
-        let archived = this.state.request.archive
+        let archived = this.state.request.archived
         let disabled = this.state.request.disabled
         let approvedDate = this.state.request.approvedDate
+<<<<<<< HEAD
         let sorted = this.state.active.filter(r => r.createdById !== this.state.request.createdById)
         
+=======
+
+>>>>>>> Release_2021_11_19
         if (this.state.request.approvedById === null) {
             status = 'Awaiting Approval'
         } else if (this.state.request.canceled === true) {
@@ -86,11 +93,15 @@ export class ReviewRequest extends Component {
             show = true
         } else if (!this.state.request.disabled) {
             show = true
-        } else if (!this.state.request.archive) {
+        } else if (!this.state.request.archived) {
             show = true
         }
 
+<<<<<<< HEAD
         this.setState({ status, show, approved, canceled, archived, disabled, approvedDate, sorted })
+=======
+        this.setState({ status, show, approved, canceled, archived, disabled, approvedDate })
+>>>>>>> Release_2021_11_19
     }
 
     onApprove() {
@@ -342,9 +353,12 @@ export class ReviewRequest extends Component {
         const data2 = await response2.json();
         const response3 = await fetch('api/User/' + data2.createdById)
         const data3 = await response3.json()
+<<<<<<< HEAD
         const response4 = await fetch('api/Request');
         const data4 = await response4.json();
         const curDate = Moment(new Date()).format('LL')
+=======
+>>>>>>> Release_2021_11_19
         
         if (data2 !== null) {
             this.setState({
@@ -353,8 +367,12 @@ export class ReviewRequest extends Component {
                 admin: isAdmin,
                 userId: userId,
                 date: data2.approvedDate,
+<<<<<<< HEAD
                 requestor: data3,
                 active: data4.filter(r => (r.createdBy.supervisorId === userId) && (Moment(r.endDate).format('LL') <= curDate && !r.archived)),
+=======
+                requestor: data3
+>>>>>>> Release_2021_11_19
             })
         }
     }
