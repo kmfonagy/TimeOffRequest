@@ -16,7 +16,8 @@ export class AddUser extends Component {
                     numberOfDaysOff: 0,
                     roles: '',
                     password: '',
-                    disabled: false
+                    disabled: false,
+                    validSupervisor: true
                 } : 
                 props.location.state.user,
             users: [],
@@ -36,6 +37,20 @@ export class AddUser extends Component {
     handleChange = (e) => {
         if (e.target.name === 'disabled') {
             this.setState({ user: {...this.state.user, disabled: !this.state.user.disabled}})
+        } else if (e.target.name === 'supervisorId') {
+            let supervisor = this.state.users.filter(u => {
+                return (u.id - e.target.value) === 0
+            })[0]
+            if ((this.state.user.id - e.target.value) === 0) {
+                this.setState({ validSupervisor: false })
+                this.setState({ user: { ...this.state.user, [e.target.name]: e.target.value } })
+            } 
+            else if (supervisor != null) {
+                this.setState({ validSupervisor: this.state.user.id !== supervisor.supervisorId })
+                this.setState({ user: { ...this.state.user, [e.target.name]: e.target.value } })
+            } else {
+                this.setState({ user: { ...this.state.user, [e.target.name]: e.target.value } })
+            }
         } else {
             this.setState({ user: { ...this.state.user, [e.target.name]: e.target.value } })
         }
@@ -134,13 +149,14 @@ export class AddUser extends Component {
                 </FormGroup>
 
                 <FormGroup row>
-                    <Label for="supervisorId" sm={2}>Select Supervisor</Label>
+                    <Label for="supervisorId" sm={2}>Supervisor</Label>
                     <Col sm={10}>
                         <Input
                             type="select"
                             value={ this.state.user.supervisorId === null ? 'Select Supervisor' : this.state.user.supervisorId }
                             name="supervisorId"
                             id="supervisorId"
+                            invalid={ !this.state.validSupervisor }
                             onChange={ this.handleChange }>
                             <option>Select Supervisor</option>
                             { this.state.users.map((user) =>
@@ -164,7 +180,7 @@ export class AddUser extends Component {
                 </FormGroup>
 
                 <FormGroup row>
-                    <Label for="role" sm={2}>Select Role</Label>
+                    <Label for="role" sm={2}>Role</Label>
                     <Col sm={10}>
                         <Input
                             type="select"
@@ -198,7 +214,7 @@ export class AddUser extends Component {
                 <FormGroup check row>
                     <Row className="m-auto">
                         <Col>
-                            <Button onClick={ this.state.type === 'Edit' ? this.handleEdit : this.handleSubmit } className="m-1">{ this.state.type === 'Edit' ? 'Update User' : 'Submit'}</Button>
+                            <Button onClick={ this.state.type === 'Edit' ? this.handleEdit : this.handleSubmit } disabled={ !this.state.validSupervisor } className="m-1">{ this.state.type === 'Edit' ? 'Update User' : 'Submit'}</Button>
                             <Button onClick={ this.handleCancel } className="m-1">Cancel</Button>
                         </Col>
                     </Row>
