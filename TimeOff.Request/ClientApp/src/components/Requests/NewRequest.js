@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import { 
+<<<<<<< HEAD
     Button, Form, FormGroup, Label, Input, Col, Row, FormText
+=======
+    Button, Form, FormGroup, Label, Input, Col, FormText
+>>>>>>> Release_2021_11_19
 }  from 'reactstrap';
 import Moment from 'moment';
 
@@ -19,7 +23,11 @@ const submitRequest = async values => {
 }
 
 const updateUser = async values => {
+<<<<<<< HEAD
     const url = '/api/User/' + values.id;
+=======
+    const url = '/api/User/' + values.user.id;
+>>>>>>> Release_2021_11_19
     const resp = await fetch(url, {
         method: 'PUT',
         headers: {
@@ -44,6 +52,10 @@ export class NewRequest extends Component {
             error: '',
             loading: true,
             available: 0,
+<<<<<<< HEAD
+=======
+            redirect: false,
+>>>>>>> Release_2021_11_19
             lastReq: 0
         }
 
@@ -67,6 +79,7 @@ export class NewRequest extends Component {
         if (this.state.startDate !== null || this.state.endDate !== null 
             || this.state.description !== null) {
             event.preventDefault();
+<<<<<<< HEAD
             const req = this.createNewRequest()
             const user = this.updateUserDays()
             
@@ -74,15 +87,27 @@ export class NewRequest extends Component {
             await submitRequest(req).then((response) => {
                 if (response.id > this.state.lastReq) {
                     this.props.onNewRequest()
+=======
+            await updateUser(this.state);
+            await submitRequest(this.state).then(response => {
+                if (response.id > this.state.lastReq) {
+                    this.CheckPass()
+>>>>>>> Release_2021_11_19
                 } else {
                     return this.setState({ error: 'Unable to submit request.' })
                 }
             })
+<<<<<<< HEAD
+=======
+            
+
+>>>>>>> Release_2021_11_19
         } else {
             return this.setState({ error: 'Not all required fields entered.' });
         }
     }
 
+<<<<<<< HEAD
     createNewRequest() {
         const req = {
             id: 0,
@@ -109,6 +134,11 @@ export class NewRequest extends Component {
         }
 
         return user
+=======
+    CheckPass() {
+        console.log('CheckPass true')
+        this.props.onNewRequest()
+>>>>>>> Release_2021_11_19
     }
 
     dateCalc = () => {
@@ -135,14 +165,23 @@ export class NewRequest extends Component {
     }
 
     render() {
+        // if (this.state.redirect) {
+        //     return <Redirect to="/history" />
+        // }
         return (
             <Form className='ml-1 mt-3'  onSubmit={this.handleSubmit}>
                 {
                     this.state.error &&
+<<<<<<< HEAD
                     <h6
                         className='mt-2'
                         style={{color: 'red'}}
                     >{this.state.error}</h6>
+=======
+                    <FormText
+                        invalid
+                    >{this.state.error}</FormText>
+>>>>>>> Release_2021_11_19
                 }
                 <FormGroup>
                     <Row>
@@ -207,6 +246,7 @@ export class NewRequest extends Component {
     }
 
     async populateRequestDate() {
+<<<<<<< HEAD
         const userId = JSON.parse(localStorage.getItem('user')).id
         const response1 = await fetch('api/User/' + userId);
         const data1 = await response1.json();
@@ -218,6 +258,17 @@ export class NewRequest extends Component {
                 user: data1,
                 loading: false,
                 lastReq: data2.length
+=======
+        const response = await fetch('api/User/' + JSON.parse(localStorage.getItem('user')).id);
+        const data = await response.json();
+        const userRequests = await fetch('api/Request/CreatedBy/' + 1)
+        const requests = await userRequests.json()
+        if (data !== null) {
+            this.setState({
+                user: data,
+                loading: false,
+                lastReq: requests[requests.length - 1].id
+>>>>>>> Release_2021_11_19
             })
         }
     }

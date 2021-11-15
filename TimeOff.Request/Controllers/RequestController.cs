@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
@@ -138,7 +138,11 @@ namespace TimeOff.Request.Controllers
 
                 var u = _reqRepo.Get(r.Id).CreatedBy;
 
+<<<<<<< HEAD
                 var n = _notificationRepo.Create(new NotificationEntity
+=======
+                _notificationRepo.Create(new NotificationEntity
+>>>>>>> Release_2021_11_19
                 {
                     RequestId = r.Id,
                     Description = u.Name + " has requested time off."

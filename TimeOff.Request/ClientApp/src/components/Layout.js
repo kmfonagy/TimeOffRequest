@@ -9,7 +9,6 @@ export class Layout extends Component {
   render () {
     let user = localStorage.getItem('user')
 
-    console.log(user === null)
     if (user === null) {
       return (
         <div>
