@@ -29,7 +29,7 @@ export class RequestTable extends Component {
     render() {
         return (
             <div>
-                <Table dark hover className="m-3">
+                <Table hover>
                     <thead>
                         <tr>
                             <th>Request</th>
@@ -38,7 +38,7 @@ export class RequestTable extends Component {
                             <th>Start Date</th>
                             <th>End Date</th>
                             <th>Days</th>
-                            <th>Disabled</th>
+                            <th>Denied</th>
                         </tr>
                     </thead>
 

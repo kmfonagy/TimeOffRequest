@@ -60,7 +60,10 @@ namespace TimeOff.Request.Domain.Repositories
 
         public NotificationEntity Update(int id, NotificationEntity entity)
         {
-            var notification = _db.Notifications.FirstOrDefault(n => n.Id == id);
+            var notification = _db.Notifications
+                .Include(n => n.NotifyUser)
+                .Include(n => n.Request)
+                .FirstOrDefault(n => n.Id == id);
 
             if (notification == null)
             {

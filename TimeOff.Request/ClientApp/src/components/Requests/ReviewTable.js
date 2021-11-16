@@ -15,7 +15,7 @@ export class ReviewTable extends Component {
     render() {
         return (
             <div>
-                <Table dark hover>
+                <Table hover>
                     <thead>
                         <tr>
                             <th>Request</th>

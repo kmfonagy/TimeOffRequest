@@ -146,7 +146,7 @@ export class ViewRequest extends Component {
     renderViewRequest(state) {
         return (
             <div>
-                <Table dark>
+                <Table>
                     <thead>
                         <tr>
                             <th>Request Number</th>

@@ -151,6 +151,13 @@ namespace TimeOff.Request.Controllers
                     n.NotifyUserId = (int)u.SupervisorId;
                 }
 
+                if (u.SupervisorId == null) {
+                    n.NotifyUserId = u.Id;
+                }
+                else {
+                    n.NotifyUserId = (int)u.SupervisorId;
+                }
+
                 _unitOfWork.SaveChanges();
 
                 return r.Map<Domain.Shared.Models.Request>();

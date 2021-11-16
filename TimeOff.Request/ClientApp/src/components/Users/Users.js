@@ -20,15 +20,12 @@ export class Users extends Component {
 
   componentDidMount() {
     this.populateUserData();
-    this.setState({ currentUser: JSON.parse(localStorage.getItem('user')).email },
-      () => {
-        console.log(this.state.currentUser)
-      })
+    this.setState({ currentUser: JSON.parse(localStorage.getItem('user')).email })
   }
 
   static renderUsersTable(users) {
     return (
-      <Table dark hover>
+      <Table hover>
         <thead>
           <tr>
             <th>Name</th>
@@ -77,7 +74,7 @@ export class Users extends Component {
       <div>
         <Row>
           <Col>
-            <h1 id="tabelLabel" >All Users</h1>
+            <h4 id="tabelLabel" >All Users</h4>
           </Col>
           <Col className="text-right">
             <Link to={{ pathname: '/AddUser', state: { type: 'Add' }}} className="btn btn-secondary" >Add User</Link>

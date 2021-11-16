@@ -174,7 +174,7 @@ export class ReviewRequest extends Component {
     renderReviewRequest(state) {
         return (
             <div>
-                <Table dark>
+                <Table>
                     <thead>
                         <tr>
                             <th>Request</th>

@@ -27,7 +27,6 @@ export class Home extends Component {
   }
 
   static renderLatestCreatedTable(userRequests) {
-    console.log(userRequests)
     return (
       <Table hover>
         <thead>
@@ -38,7 +37,7 @@ export class Home extends Component {
             <th>Start Date</th>
             <th>End Date</th>
             <th>Days</th>
-            <th>Canceled</th>
+            <th>Denied</th>
           </tr>
         </thead>
 
@@ -82,7 +81,7 @@ export class Home extends Component {
             <th>Start Date</th>
             <th>End Date</th>
             <th>Days</th>
-            <th>Canceled</th>
+            <th>Denied</th>
           </tr>
         </thead>
 
@@ -175,6 +174,6 @@ export class Home extends Component {
     this.setState({ loading: true })
     const response = await fetch('api/request/createdBy/' + id)
     const data = await response.json()
-    this.setState({ completedRequests: data.filter((a) => moment().diff(a.endDate, 'days') < 0).slice(0, 5), loading: false })
+    this.setState({ completedRequests: data.filter((a) => moment().diff(a.endDate, 'days') > 0).slice(0, 5), loading: false })
   }
 }
