@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-import { Table, Button, Row, Input } from 'reactstrap';
+import { Table, Row, Input } from 'reactstrap';
 import Moment from 'moment';
 import Col from 'reactstrap/lib/Col';
 import { Link } from 'react-router-dom';
-import { Redirect } from 'react-router';
 
 export class Users extends Component {
   static displayName = Users.name;
@@ -21,18 +20,14 @@ export class Users extends Component {
 
   componentDidMount() {
     this.populateUserData();
-    this.setState({ currentUser: JSON.parse(localStorage.getItem('user')).email },
-      () => {
-        console.log(this.state.currentUser)
-      })
+    this.setState({ currentUser: JSON.parse(localStorage.getItem('user')).email })
   }
 
   static renderUsersTable(users) {
     return (
-      <Table dark hover>
+      <Table hover>
         <thead>
           <tr>
-            <th>Id</th>
             <th>Name</th>
             <th>Email</th>
             <th>Created</th>
@@ -45,7 +40,6 @@ export class Users extends Component {
         <tbody>
           {users.map(user =>
             <tr key={ user.id }>
-              <td>{ user.id }</td>
               <td>{ user.name }</td>
               <td>{ user.email }</td>
               <td>{ Moment(user.userCreated).format('LL') }</td>
@@ -80,7 +74,7 @@ export class Users extends Component {
       <div>
         <Row>
           <Col>
-            <h1 id="tabelLabel" >All Users</h1>
+            <h4 id="tabelLabel" >All Users</h4>
           </Col>
           <Col className="text-right">
             <Link to={{ pathname: '/AddUser', state: { type: 'Add' }}} className="btn btn-secondary" >Add User</Link>

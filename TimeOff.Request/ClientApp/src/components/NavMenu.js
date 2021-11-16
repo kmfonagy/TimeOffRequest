@@ -13,12 +13,14 @@ export class NavMenu extends Component {
     this.state = {
       collapsed: true,
       newNotifications: [],
-      currentUser: null
+      currentUser: null,
+      userIsSupervisor: false
     };
   }
 
   componentDidMount() {
     this.loadNotifications()
+    this.userIsSupervisor()
     this.setState({ currentUser: JSON.parse(localStorage.getItem('user')) })
   }
 
@@ -56,6 +58,13 @@ export class NavMenu extends Component {
                 <NavItem>
                   <NavLink tag={Link} className="text-dark" to="/history">Requests</NavLink>
                 </NavItem>
+                {
+                  this.state.userIsSupervisor ?
+                  <NavItem>
+                    <NavLink tag={Link} className="text-dark" to="/review-requests">Review Requests</NavLink>
+                  </NavItem>
+                  : null
+                }
                 <NavItem>
                     <NavLink tag={Link} className="text-dark" to="/notifications">Notifications <Badge color="danger">{ this.state.newNotifications.length > 0 ? this.state.newNotifications.length : null }</Badge></NavLink>
                 </NavItem>
@@ -74,5 +83,11 @@ export class NavMenu extends Component {
     const response = await fetch('/api/Notification/Unread?userId=' + JSON.parse(localStorage.getItem('user')).id)
     const data = await response.json()
     this.setState({ newNotifications: data })
+  }
+
+  async userIsSupervisor() {
+    const response = await fetch('/api/User/Supervisor/' + JSON.parse(localStorage.getItem('user')).id)
+    const data = await response.json()
+    this.setState({ userIsSupervisor: data.length > 0 })
   }
 }
