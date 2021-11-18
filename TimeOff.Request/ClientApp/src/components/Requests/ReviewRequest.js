@@ -208,7 +208,7 @@ export class ReviewRequest extends Component {
                     </thead>
                     <tbody>
                         <tr>
-                            <td>{Moment(state.request.createdDate).format('LL')}</td>
+                            <td>{Moment(state.request.startDate).format('LL')}</td>
                             <td>{Moment(state.request.endDate).format('LL')}</td>
                             <td style={{textAlign: 'center'}}>{state.request.numberOfDays}</td>
                         </tr>
