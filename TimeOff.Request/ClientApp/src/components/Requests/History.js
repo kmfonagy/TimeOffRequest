@@ -67,6 +67,14 @@ export class History extends Component {
             }
         }
 
+        if (value === "Denied") {
+            for (let i = 0; i < this.state.requests.length; i++) {
+                if (this.state.requests[i].canceled === true) {
+                    sorted.push(this.state.requests[i]);
+                }
+            }
+        }
+
         this.setState({
             loading: true,
             sorted: sorted,
@@ -144,7 +152,8 @@ export class History extends Component {
     render() {
         const dropdown = [
             { id: 0, value: "Approved" },
-            { id: 1, value: "Unapproved" }
+            { id: 1, value: "Unapproved" },
+            { id: 2, value: "Denied" }
         ]
 
         return (
