@@ -122,7 +122,7 @@ export class ReviewRequest extends Component {
 
     onArchive() {
         this.setState({
-            archive: true,
+            archived: true,
         })
     }
 
