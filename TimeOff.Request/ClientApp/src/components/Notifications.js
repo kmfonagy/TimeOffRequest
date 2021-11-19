@@ -1,5 +1,5 @@
 ﻿import React, { Component } from 'react';
-import { Table, Button, FormGroup, Label, Input } from 'reactstrap';
+import { Table, Button, FormGroup, Input } from 'reactstrap';
 import Spinner from 'reactstrap/lib/Spinner';
 
 
@@ -44,6 +44,18 @@ export class Notifications extends Component {
         window.location.reload()
     }
 
+    async handleDelete(e) {
+        const requestOptions = {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+        };
+        console.log(e.target.id)
+        const response = await fetch('api/notification/' + e.target.id, requestOptions)
+
+        if (response.ok) {
+            window.location.reload()
+        }
+    }
 
     renderNotificationTable() {
         if (this.state.loading) {
@@ -53,13 +65,13 @@ export class Notifications extends Component {
         }
 
         return (
-            <Table hover striped>
+            <Table hover>
                 <thead>
                     <tr>
                         <th>Request</th>
                         <th>User</th>
                         <th>Notification Description</th>
-                        <th>Mark Read</th>
+                        <th className="text-center">Read</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -69,16 +81,19 @@ export class Notifications extends Component {
                             <td>{notification.notifyUser.name}</td>
                             <td>{notification.description}</td>
                             <td className="m-auto">
-                            <FormGroup className="mb-3 mt-0">
-                                <FormGroup check>
-                                    <Input
-                                        type="checkbox"
-                                        id={ notification.id }
-                                        defaultChecked={ notification.read }
-                                        onClick={ this.handleChange }
-                                        name="read" />
+                                <FormGroup className="mb-3 mt-0">
+                                    <FormGroup className="text-center" check>
+                                        <Input
+                                            type="checkbox"
+                                            id={ notification.id }
+                                            defaultChecked={ notification.read }
+                                            onClick={ this.handleChange }
+                                            name="read" />
+                                    </FormGroup>
                                 </FormGroup>
-                            </FormGroup>
+                            </td>
+                            <td>
+                                <Button id={ notification.id } onClick={ this.handleDelete }>Delete</Button>
                             </td>
                         </tr>
                     )}
