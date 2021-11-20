@@ -122,7 +122,7 @@ export class ReviewRequest extends Component {
 
     onArchive() {
         this.setState({
-            archive: true,
+            archived: true,
         })
     }
 
@@ -198,7 +198,7 @@ export class ReviewRequest extends Component {
                         </tr>
                     </tbody>
                 </Table>
-                <Table dark>
+                <Table>
                     <thead>
                         <tr>
                             <td>Start Date</td>
@@ -208,13 +208,13 @@ export class ReviewRequest extends Component {
                     </thead>
                     <tbody>
                         <tr>
-                            <td>{Moment(state.request.createdDate).format('LL')}</td>
+                            <td>{Moment(state.request.startDate).format('LL')}</td>
                             <td>{Moment(state.request.endDate).format('LL')}</td>
                             <td style={{textAlign: 'center'}}>{state.request.numberOfDays}</td>
                         </tr>
                     </tbody>
                 </Table>
-                <Table dark>
+                <Table>
                     <thead>
                         <tr>
                             <td>Description</td>
@@ -279,8 +279,8 @@ export class ReviewRequest extends Component {
         if (approved.length > 0) {
             return (
                 <div>
-                    <h6>Active Approved Requests</h6>
-                    <Table dark>
+                    <h6 className="pl-2">Active Approved Requests</h6>
+                    <Table>
                         <thead>
                             <tr>
                                 <td>User</td>

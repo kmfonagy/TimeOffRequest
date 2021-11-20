@@ -38,7 +38,7 @@ export class RequestTable extends Component {
                             <th>Start Date</th>
                             <th>End Date</th>
                             <th>Days</th>
-                            <th>Denied</th>
+                            <th>Disable</th>
                         </tr>
                     </thead>
 

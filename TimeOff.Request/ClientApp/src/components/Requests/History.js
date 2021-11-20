@@ -59,9 +59,17 @@ export class History extends Component {
             }
         }
 
-        if (value === "Unapproved") {
+        if (value === "Awaiting Approval") {
             for (let i = 0; i < this.state.requests.length; i++) {
-                if (this.state.requests[i].approvedById === null) {
+                if (this.state.requests[i].approvedById === null && this.state.requests[i].canceled === false) {
+                    sorted.push(this.state.requests[i]);
+                }
+            }
+        }
+
+        if (value === "Denied") {
+            for (let i = 0; i < this.state.requests.length; i++) {
+                if (this.state.requests[i].canceled === true) {
                     sorted.push(this.state.requests[i]);
                 }
             }
@@ -144,7 +152,8 @@ export class History extends Component {
     render() {
         const dropdown = [
             { id: 0, value: "Approved" },
-            { id: 1, value: "Unapproved" }
+            { id: 1, value: "Awaiting Approval" },
+            { id: 2, value: "Denied" }
         ]
 
         return (
@@ -202,7 +211,8 @@ export class History extends Component {
     }
 
     async populateRequestData() {
-        const response = await fetch('api/request/CreatedBy/' + JSON.parse(localStorage.getItem('user')).id);
+        const user = JSON.parse(localStorage.getItem('user'))
+        const response = await fetch('api/request/CreatedBy/' + user.id);
         const data = await response.json();
         
         if (data.length > 0) {
