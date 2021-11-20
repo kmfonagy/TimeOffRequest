@@ -17,7 +17,9 @@ export class Home extends Component {
           userRequests: [],
           completedRequests: [],
           userOutOfOffice: [],
-          isSupervisor: false
+          isSupervisor: false,
+          supervisorOutOfOffice: false,
+          supervisorRequest: {}
       }
   }
 
@@ -39,6 +41,7 @@ export class Home extends Component {
     this.loadUserRequests(u.id)
     this.loadCompletedUserRequests(u.id)
     this.loadEmployeesOutOfOffice(u.id)
+    this.verifySupervisorAvailable(u.supervisorId)
   }
 
   static renderLatestCreatedTable(userRequests) {
@@ -205,6 +208,7 @@ export class Home extends Component {
           <Col>
             <p>Supervisor: { this.state.user.supervisor === null ? 'No supervisor' :  this.state.user.supervisor.name }</p>
             <p>Supervisor Email: { this.state.user.supervisor === null ? 'No supervisor' :  this.state.user.supervisor.email }</p>
+            { this.state.supervisorOutOfOffice ? <p>Supervisor is currently out of office. Expected return: { moment(this.state.supervisorRequest.endDate).format('MMM DD, YY') }</p> : null }
           </Col>
         </Row>
         <Row>
@@ -264,6 +268,17 @@ export class Home extends Component {
             this.setState({ userOutOfOffice: this.state.userOutOfOffice.concat(d) })
           }
         })
+      }
+    }
+  }
+
+  async verifySupervisorAvailable(id) {
+    if (id !== null) { 
+      const response = await fetch('api/request/createdBy/' + id)
+      const data = await response.json()
+      if (response.ok) {
+        this.setState({ supervisorOutOfOffice: data.filter(r => moment().diff(r.startDate, 'days') >= 0 && moment().diff(r.endDate, 'days') <= 0).length > 0 })
+        this.setState({ supervisorRequest: data.filter(r => moment().diff(r.startDate, 'days') >= 0 && moment().diff(r.endDate, 'days') <= 0)[0] })
       }
     }
   }
